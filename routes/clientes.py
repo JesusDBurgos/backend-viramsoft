@@ -25,7 +25,7 @@ def get_costumers(db: Session = Depends(get_db)):
 
 # Endpoint para buscar un cliente por su ID
 
-@clientesR.get("/costumer/{id}",response_model=ClientePydantic,summary="Este endpoint consulta un producto por su id", status_code=status.HTTP_200_OK,tags=["Clientes"])
+@clientesR.get("/costumer/{id}",response_model=ClientePydantic,summary="Este endpoint consulta un cliente por su id", status_code=status.HTTP_200_OK,tags=["Clientes"])
 def search_costumer(id:str,db: Session = Depends(get_db)):
     """
     Busca un cliente por su ID.
