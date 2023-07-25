@@ -1,9 +1,19 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from routes.index import productosR, clientesR, pedidosR
 from config.database import create_tables
 from models.index import Cliente_table,Producto_table,DetallePedido_table,Pedido_table
 
 app = FastAPI()
+
+# Configurar el origen permitido como comodín para permitir cualquier origen
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(productosR)
 app.include_router(clientesR)

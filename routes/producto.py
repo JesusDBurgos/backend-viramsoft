@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Response, status, HTTPException
 from config.database import conn,get_db
 from models.index import Producto_table
 from schemas.index import ProductoPydantic
@@ -22,6 +22,9 @@ def get_products(db: Session = Depends(get_db)):
     """
     # Consultar todos los productos de la base de datos utilizando SQLAlchemy
     products = db.query(Producto_table).all()
+    # Verificar si hay productos. Si no hay productos, lanzar una excepción 404 (Not Found)
+    if not products:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No se encontraron productos")
     # Devolver una respuesta JSON con la lista de productos obtenidos
     return {"productos": products}
 
@@ -69,7 +72,7 @@ def create_product(producto: ProductoPydantic, db: Session = Depends(get_db)):
         dict: Un diccionario JSON con los datos del nuevo producto creado.
     """
     # Crear un nuevo objeto Producto_table utilizando los datos proporcionados en el cuerpo de la solicitud
-    db_product = Producto_table(nombre = producto.nombre, cantidad = producto.cantidad, 
+    db_product = Producto_table(nombre = producto.nombre,marca = producto.marca, cantidad = producto.cantidad, 
                           valorCompra= producto.valorCompra, valorVenta= producto.valorVenta,
                           unidadMedida= producto.unidadMedida, fechaVencimiento= producto.fechaVencimiento)
     # Agregar el nuevo producto a la sesión de la base de datos
@@ -84,6 +87,11 @@ def create_product(producto: ProductoPydantic, db: Session = Depends(get_db)):
 # Definir el endpoint para actualizar un producto por su ID
 @productosR.put("/edit_product/{id}",response_model=ProductoPydantic, status_code=status.HTTP_200_OK, tags=["Productos"])
 async def update_data(id: str, producto: ProductoPydantic):
+    # Verificar si el producto existe en la base de datos
+    existing_product = conn.execute(select(Producto_table).where(Producto_table.idProducto == id)).fetchone()
+    if not existing_product:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El producto no existe")
+    
     # Crear la consulta para actualizar el producto en la base de datos
     query = update(Producto_table).where(Producto_table.idProducto == id).values(
         nombre = producto.nombre,
@@ -92,17 +100,27 @@ async def update_data(id: str, producto: ProductoPydantic):
         valorVenta = producto.valorVenta,
         unidadMedida = producto.unidadMedida,
         fechaVencimiento = producto.fechaVencimiento)
-    # Ejecutar la consulta para actualizar el producto en la base de datos
-    producto = conn.execute(query)
-    # Crear una consulta para obtener el producto actualizado
-    response = select(Producto_table).where(Producto_table.idProducto == id)
-    # Ejecutar la consulta para obtener el producto actualizado de la base de datos
-    response = conn.execute(response).fetchone()
-    # Convertir el resultado en un diccionario para modificar el formato de la fecha y el ID
-    response = response._asdict()
-    response['idProducto'] = str(response['idProducto'])
-    # Devolver el producto actualizado en el formato esperado (ProductoPydantic)
-    return ProductoPydantic(**response)
+    try:
+        # Ejecutar la consulta para actualizar el producto en la base de datos
+        conn.execute(query)
+
+        # Crear una consulta para obtener el producto actualizado
+        response = select(Producto_table).where(Producto_table.idProducto == id)
+
+        # Ejecutar la consulta para obtener el producto actualizado de la base de datos
+        response = conn.execute(response).fetchone()
+
+        # Convertir el resultado en un diccionario para modificar el formato de la fecha y el ID
+        response = response._asdict()
+        response['idProducto'] = str(response['idProducto'])
+
+        # Devolver el producto actualizado en el formato esperado (ProductoPydantic)
+        return ProductoPydantic(**response)
+
+    except Exception as e:
+        # Manejar errores en la base de datos u otros errores inesperados
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error interno del servidor")
+
 
 # @productosR.delete("/")
 # async def delete_data():

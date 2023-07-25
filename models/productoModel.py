@@ -7,6 +7,7 @@ class Producto_table(Base):
     __tablename__ = "producto"
     idProducto = Column(Integer,autoincrement=True, primary_key=True, nullable=False)
     nombre = Column(String(255),nullable=False)
+    marca = Column(String(255), nullable=False)
     cantidad = Column(Integer,nullable=False)
     valorCompra = Column(Float,nullable=False)
     valorVenta = Column(Float,nullable=False)
