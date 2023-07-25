@@ -1,25 +1,45 @@
-from fastapi import APIRouter, Depends,status, Response
+from fastapi import APIRouter, Depends,status, Response, HTTPException
 from config.database import conn,get_db
-from models.index import Pedido_table,DetallePedido_table
-from schemas.index import PedidoPydantic,detallePedPydantic,ProductoPydantic, CantidadPydantic
+from models.index import Pedido_table,DetallePedido_table, Producto_table
+from schemas.index import PedidoAggPydantic,ProductoPydantic, CantidadPydantic, ProductosIdPydantic
 from sqlalchemy.orm import Session
 from sqlalchemy import select,update
+from datetime import datetime
 from typing import List
 
 pedidosR = APIRouter()
-
-# Lista para almacenar los productos recibidos en el endpoint post
-lista_productos = []
-lista_cantidades = []
+#fecha - 
 
 
-@pedidosR.post("/create_order",summary="Este endpoint crea un producto",status_code=status.HTTP_201_CREATED,tags=["Pedido"])
-def create_order(pedido: PedidoPydantic,detalle:detallePedPydantic,
-                 db: Session = Depends(get_db), productos: List[ProductoPydantic] = None, cantidadI: List[CantidadPydantic] = None):
-    
+@pedidosR.get("/order",summary="Este endpoint consulta los pedidos", status_code=status.HTTP_200_OK,tags=["Pedido"])
+def get_orders(db: Session = Depends(get_db)):
+    """
+    Obtiene todos los pedidos desde la base de datos.
+
+    Args:
+        db (Session): Objeto de sesión de la base de datos.
+
+    Returns:
+        dict: Un diccionario JSON con la lista de pedidos.
+    """
+    # Consultar todos los productos de la base de datos utilizando SQLAlchemy
+    orders = db.query(Pedido_table).all()
+    # Verificar si hay productos. Si no hay productos, lanzar una excepción 404 (Not Found)
+    if not orders:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No se encontraron pedidos")
+    # Devolver una respuesta JSON con la lista de productos obtenidos
+    return {"pedidos": orders}
+
+@pedidosR.post("/create_order",summary="Este endpoint crea un pedido",status_code=status.HTTP_201_CREATED,tags=["Pedido"])
+def create_order(pedido: PedidoAggPydantic, id: List[ProductosIdPydantic],
+                 db: Session = Depends(get_db), cantidadI: List[CantidadPydantic] = None):
+    # Obtener la fecha actual
+    fecha_actual = datetime.now()
+    fecha_pedido = fecha_actual.strftime("%Y-%m-%d")
     db_pedido = Pedido_table(
                               documentoCliente = pedido.documentoCliente,
-                              fechaPedido= pedido.fechaPedido,
+                              observacion = pedido.observacion,
+                              fechaPedido= fecha_pedido,
                               fechaEntrega= pedido.fechaEntrega,
                               valorTotal = 0,
                               estado= "Pendiente",
@@ -31,13 +51,17 @@ def create_order(pedido: PedidoPydantic,detalle:detallePedPydantic,
     # Refrescar el objeto para asegurarse de que los cambios se reflejen en el objeto en memoria
     db.refresh(db_pedido)
     valorTotalPed = 0.0
-    for producto,cantidad in zip(productos, cantidadI):
-        valorVenta = producto.valorVenta * cantidad.cantidad
+    for id,cantidad in zip(id,cantidadI):
+        producto_accedido = conn.execute(select(Producto_table).where(Producto_table.idProducto == id.id)).fetchone()
+        producto_accedido = producto_accedido._asdict()
+        producto_accedido['idProducto'] = str(producto_accedido['idProducto'])
+        producto_pydantic = ProductoPydantic(**producto_accedido)
+        valorVenta = producto_pydantic.valorVenta * cantidad.cantidad
         valorTotalPed += valorVenta
         db_productos = DetallePedido_table(
                                             idDetalle = db_pedido.idPedido,
                                             idPedido = db_pedido.idPedido,
-                                            idProducto = producto.idProducto,
+                                            idProducto = producto_pydantic.idProducto,
                                             cantidad = cantidad.cantidad,
                                             precio = valorVenta
                                         )

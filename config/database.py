@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models.index import Base
 
-engine = create_engine("mysql+pymysql://pruebas@34.31.54.110/viramsoft")
+engine = create_engine("mysql+pymysql://root:1234@localhost/viramsoft")
 
 conn = engine.connect()
 

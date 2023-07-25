@@ -14,3 +14,6 @@ class ProductoPydantic(BaseModel):
 
 class CantidadPydantic(BaseModel):
     cantidad: int
+
+class ProductosIdPydantic(BaseModel):
+    id: int
