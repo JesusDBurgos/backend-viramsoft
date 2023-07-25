@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends,status, Response
 from config.database import conn,get_db
 from models.index import Pedido_table,DetallePedido_table
-from schemas.index import PedidoPydantic,detallePedPydantic,ProductoPydantic, CantidadPydantic, valorPedPydantic
+from schemas.index import PedidoPydantic,detallePedPydantic,ProductoPydantic, CantidadPydantic
 from sqlalchemy.orm import Session
 from sqlalchemy import select,update
 from typing import List
@@ -20,6 +20,7 @@ def create_order(pedido: PedidoPydantic,detalle:detallePedPydantic,
     db_pedido = Pedido_table(
                               documentoCliente = pedido.documentoCliente,
                               fechaPedido= pedido.fechaPedido,
+                              fechaEntrega= pedido.fechaEntrega,
                               valorTotal = 0,
                               estado= "Pendiente",
                             )
