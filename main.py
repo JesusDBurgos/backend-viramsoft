@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes.index import productosR, clientesR, pedidosR
+from auth.auth import auth_router
 from config.database import create_tables
-from models.index import Cliente_table,Producto_table,DetallePedido_table,Pedido_table
+from models.index import Cliente_table,Producto_table,DetallePedido_table,Pedido_table,User
 
 app = FastAPI()
 
@@ -15,6 +16,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth_router)
 app.include_router(productosR)
 app.include_router(clientesR)
 app.include_router(pedidosR)
