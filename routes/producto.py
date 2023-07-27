@@ -30,13 +30,13 @@ def get_products(db: Session = Depends(get_db)):
 
 # Endpoint para buscar un producto por su Categoria
 
-@productosR.get("/product/{categoria}",response_model=ProductosCatPydantic,summary="Este endpoint consulta un producto por su categoría", status_code=status.HTTP_200_OK,tags=["Productos"])
+@productosR.get("/product/{categoria}",response_model=ProductoPydantic,summary="Este endpoint consulta un producto por su categoría", status_code=status.HTTP_200_OK,tags=["Productos"])
 def search_product(categoria:str,db: Session = Depends(get_db)):
     """
-    Busca un producto por su ID.
+    Busca un producto por su Categoría.
 
     Args:
-        categoria (str): categoria de los productos a buscar.
+        categoria (str): categoría de los productos a buscar.
         db (Session): Objeto de sesión de la base de datos.
 
     Returns:
@@ -52,10 +52,10 @@ def search_product(categoria:str,db: Session = Depends(get_db)):
     if not productos:
         return Response(status_code=status.HTTP_404_NOT_FOUND, content="Producto no encontrado")
     # Convertir la tupla en un diccionario y convertir el ID a una cadena
-    #producto_dict = productos._asdict()
+    productos_namedtuple = [producto._asdict() for producto in productos]
     #producto_dict['idProducto'] = str(producto_dict['idProducto'])
-    # Devolver el producto encontrado en formato JSON utilizando el modelo ProductoPydantic
-    return {"productos": productos}
+    # Devolver el producto encontrado en formato JSON utilizando el modelo
+    return ProductoPydantic(**productos_namedtuple)
 
 # Endpoint para crear un nuevo producto
 
