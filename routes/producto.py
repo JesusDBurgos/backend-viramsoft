@@ -55,7 +55,7 @@ def search_product(categoria:str,db: Session = Depends(get_db)):
     productos_namedtuple = [producto._asdict() for producto in productos]
     #producto_dict['idProducto'] = str(producto_dict['idProducto'])
     # Devolver el producto encontrado en formato JSON utilizando el modelo
-    return ProductoPydantic(**productos_namedtuple)
+    return {"productos": productos_namedtuple}
 
 # Endpoint para crear un nuevo producto
 
