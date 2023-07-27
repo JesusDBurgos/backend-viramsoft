@@ -5,6 +5,7 @@ class ClientePydantic(BaseModel):
     nombre: str = "Luis Perez"
     direccion: str = "Carrera 65 #13-2"
     telefono: str = "3157017745"
+    estado: str = "ACTIVO"
 
 class ClienteEditarPydantic(BaseModel):
     nombre: str = "Luis Perez"

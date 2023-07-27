@@ -38,7 +38,7 @@ def search_costumer(id:str,db: Session = Depends(get_db)):
         dict: Un diccionario JSON con los datos del cliente encontrado.
     """
     # Construir la consulta SELECT utilizando SQLAlchemy
-    query = select(Cliente_table).where(Cliente_table.documento == id)
+    query = select(Cliente_table).where(Cliente_table.documento == id and Cliente_table.documento == "ACTIVO")
     # Ejecutar la consulta en la base de datos
     resultado = conn.execute(query)
     # Obtener el primer resultado de la consulta
@@ -69,7 +69,8 @@ def create_product(cliente: ClientePydantic, db: Session = Depends(get_db)):
     db_product = Cliente_table(documento = cliente.documento,
                                 nombre = cliente.nombre,
                                 direccion= cliente.direccion,
-                                telefono= cliente.telefono)
+                                telefono= cliente.telefono,
+                                estado = "ACTIVO")
     # Agregar el nuevo producto a la sesión de la base de datos
     db.add(db_product)
     # Confirmar los cambios en la base de datos

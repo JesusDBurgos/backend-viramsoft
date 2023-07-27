@@ -8,3 +8,4 @@ class Cliente_table(Base):
     nombre = Column( String(255), nullable=False)
     direccion = Column( String(255), nullable=False)
     telefono = Column( String(255), nullable=False)
+    estado = Column(String(255), nullable=False)
