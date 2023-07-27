@@ -6,6 +6,16 @@ class ProductoPydantic(BaseModel):
     idProducto: Optional[int] = 1
     nombre: str = "Varsol"
     marca: str = "P&G"
+    categoria: str = "Líquidos"
+    cantidad: int = 15
+    valorCompra: float = 4200
+    valorVenta: float = 6500
+    unidadMedida: str = "500ML"
+    fechaVencimiento: date = date(2023, 7, 19)
+
+class ProductoUpdatePydantic(BaseModel):
+    nombre: str = "Varsol"
+    marca: str = "P&G"
     cantidad: int = 15
     valorCompra: float = 4200
     valorVenta: float = 6500

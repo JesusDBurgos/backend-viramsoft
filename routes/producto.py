@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Response, status, HTTPException
 from config.database import conn,get_db
 from models.index import Producto_table
-from schemas.index import ProductoPydantic
+from schemas.index import ProductoPydantic,ProductoUpdatePydantic
 from sqlalchemy.orm import Session
 from sqlalchemy import select,update
 
@@ -72,7 +72,7 @@ def create_product(producto: ProductoPydantic, db: Session = Depends(get_db)):
         dict: Un diccionario JSON con los datos del nuevo producto creado.
     """
     # Crear un nuevo objeto Producto_table utilizando los datos proporcionados en el cuerpo de la solicitud
-    db_product = Producto_table(nombre = producto.nombre,marca = producto.marca, cantidad = producto.cantidad, 
+    db_product = Producto_table(nombre = producto.nombre,marca = producto.marca,categoria= producto.categoria, cantidad = producto.cantidad, 
                           valorCompra= producto.valorCompra, valorVenta= producto.valorVenta,
                           unidadMedida= producto.unidadMedida, fechaVencimiento= producto.fechaVencimiento)
     # Agregar el nuevo producto a la sesión de la base de datos
@@ -85,8 +85,8 @@ def create_product(producto: ProductoPydantic, db: Session = Depends(get_db)):
     return db_product
 
 # Definir el endpoint para actualizar un producto por su ID
-@productosR.put("/edit_product/{id}",response_model=ProductoPydantic, status_code=status.HTTP_200_OK, tags=["Productos"])
-async def update_data(id: str, producto: ProductoPydantic):
+@productosR.put("/edit_product/{id}",response_model=ProductoUpdatePydantic, status_code=status.HTTP_200_OK, tags=["Productos"])
+async def update_data(id: str, producto: ProductoUpdatePydantic):
     # Verificar si el producto existe en la base de datos
     existing_product = conn.execute(select(Producto_table).where(Producto_table.idProducto == id)).fetchone()
     if not existing_product:
@@ -95,6 +95,7 @@ async def update_data(id: str, producto: ProductoPydantic):
     # Crear la consulta para actualizar el producto en la base de datos
     query = update(Producto_table).where(Producto_table.idProducto == id).values(
         nombre = producto.nombre,
+        marca = producto.marca,
         cantidad = producto.cantidad,
         valorCompra = producto.valorCompra,
         valorVenta = producto.valorVenta,
