@@ -28,26 +28,26 @@ def get_products(db: Session = Depends(get_db)):
     # Devolver una respuesta JSON con la lista de productos obtenidos
     return {"productos": products}
 
-# Endpoint para buscar un producto por su ID
+# Endpoint para buscar un producto por su Categoria
 
-@productosR.get("/product/{id}",response_model=ProductoPydantic,summary="Este endpoint consulta un producto por su id", status_code=status.HTTP_200_OK,tags=["Productos"])
-def search_product(id:str,db: Session = Depends(get_db)):
+@productosR.get("/product/{categoria}",response_model=ProductoPydantic,summary="Este endpoint consulta un producto por su id", status_code=status.HTTP_200_OK,tags=["Productos"])
+def search_product(categoria:str,db: Session = Depends(get_db)):
     """
     Busca un producto por su ID.
 
     Args:
-        id (str): ID del producto a buscar.
+        categoria (str): categoria de los productos a buscar.
         db (Session): Objeto de sesión de la base de datos.
 
     Returns:
         dict: Un diccionario JSON con los datos del producto encontrado.
     """
     # Construir la consulta SELECT utilizando SQLAlchemy
-    query = select(Producto_table).where(Producto_table.idProducto == id)
+    query = select(Producto_table).where(Producto_table.categoria == categoria)
     # Ejecutar la consulta en la base de datos
     resultado = conn.execute(query)
     # Obtener el primer resultado de la consulta
-    producto = resultado.fetchone()
+    producto = resultado.fetchall()
     # Si no se encuentra el producto, devolver una respuesta 404
     if not producto:
         return Response(status_code=status.HTTP_404_NOT_FOUND, content="Producto no encontrado")

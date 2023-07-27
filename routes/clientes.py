@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Response, status
 from config.database import conn,get_db
 from models.index import Cliente_table
-from schemas.index import ClientePydantic
+from schemas.index import ClientePydantic, ClienteEditarPydantic
 from sqlalchemy.orm import Session
 from sqlalchemy import select,update
 
@@ -68,7 +68,6 @@ def create_product(cliente: ClientePydantic, db: Session = Depends(get_db)):
     # Crear un nuevo objeto Cliente_table utilizando los datos proporcionados en el cuerpo de la solicitud
     db_product = Cliente_table(documento = cliente.documento,
                                 nombre = cliente.nombre,
-                                apellido= cliente.apellido,
                                 direccion= cliente.direccion,
                                 telefono= cliente.telefono)
     # Agregar el nuevo producto a la sesión de la base de datos
@@ -82,8 +81,8 @@ def create_product(cliente: ClientePydantic, db: Session = Depends(get_db)):
 
 # Endpoint para modificar un cliente
 
-@clientesR.put("/edit_costumer/{id}",response_model=ClientePydantic, status_code=status.HTTP_200_OK, tags=["Clientes"])
-async def update_data(id: str, cliente: ClientePydantic):
+@clientesR.put("/edit_costumer/{id}",response_model=ClienteEditarPydantic, status_code=status.HTTP_200_OK, tags=["Clientes"])
+async def update_data(id: str, cliente: ClienteEditarPydantic):
     """
     Modifica un cliente de la base de datos.
 
@@ -96,9 +95,7 @@ async def update_data(id: str, cliente: ClientePydantic):
     """
     # Crear la consulta para actualizar el cliente en la base de datos
     query = update(Cliente_table).where(Cliente_table.documento == id).values(
-                    documento = cliente.documento,
                     nombre = cliente.nombre,
-                    apellido= cliente.apellido,
                     direccion= cliente.direccion,
                     telefono= cliente.telefono)
     # Ejecutar la consulta para actualizar el cliente en la base de datos
