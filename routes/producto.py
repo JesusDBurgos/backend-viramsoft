@@ -4,6 +4,7 @@ from models.index import Producto_table
 from schemas.index import ProductoPydantic,ProductoUpdatePydantic, ProductosCatPydantic
 from sqlalchemy.orm import Session
 from sqlalchemy import select,update
+from typing import List
 
 productosR = APIRouter()
 
@@ -30,7 +31,7 @@ def get_products(db: Session = Depends(get_db)):
 
 # Endpoint para buscar un producto por su Categoria
 
-@productosR.get("/product/{categoria}",summary="Este endpoint consulta un producto por su categoría", status_code=status.HTTP_200_OK,tags=["Productos"])
+@productosR.get("/product/{categoria}",response_model=List[ProductoPydantic],summary="Este endpoint consulta un producto por su categoría", status_code=status.HTTP_200_OK,tags=["Productos"])
 def search_product(categoria:str,db: Session = Depends(get_db)):
     """
     Busca un producto por su Categoría.
@@ -50,12 +51,10 @@ def search_product(categoria:str,db: Session = Depends(get_db)):
     productos = resultado.fetchall()
     # Si no se encuentra el producto, devolver una respuesta 404
     if not productos:
-        return Response(status_code=status.HTTP_404_NOT_FOUND, content="Producto no encontrado")
-    # Convertir la tupla en un diccionario y convertir el ID a una cadena
-    productos_namedtuple = [producto._asdict() for producto in productos]
-    #producto_dict['idProducto'] = str(producto_dict['idProducto'])
-    # Devolver el producto encontrado en formato JSON utilizando el modelo
-    return {"productos": productos_namedtuple}
+        return []
+    # Convertir los resultados en una lista de instancias de ProductoPydantic
+    productos_response = [ProductoPydantic(**producto._asdict()) for producto in productos]
+    return productos_response
 
 # Endpoint para crear un nuevo producto
 
