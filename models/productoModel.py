@@ -10,8 +10,8 @@ class Producto_table(Base):
     marca = Column(String(255), nullable=False)
     categoria = Column(String(255), nullable=False)
     cantidad = Column(Integer,nullable=False)
-    valorCompra = Column(Float,nullable=False)
-    valorVenta = Column(Float,nullable=False)
+    valorCompra = Column(Integer,nullable=False)
+    valorVenta = Column(Integer,nullable=False)
     unidadMedida = Column(String(255),nullable=False)
     fechaVencimiento = Column(Date)
 
