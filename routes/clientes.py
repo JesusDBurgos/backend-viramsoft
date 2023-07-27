@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Response, status, HTTPException
 from config.database import conn,get_db
 from models.index import Cliente_table
 from schemas.index import ClientePydantic, ClienteEditarPydantic
@@ -19,7 +19,8 @@ def get_costumers(db: Session = Depends(get_db)):
         dict: Un diccionario JSON con la lista de clientes.
     """
     # Consultar todos los clientes de la base de datos utilizando SQLAlchemy
-    clientes = db.query(Cliente_table).all()
+    clientes = db.query(Cliente_table).select_from(Cliente_table).where(Cliente_table.estado == "ACTIVO")
+    #clientes = db.query(Cliente_table).all()
     # Devolver una respuesta JSON con la lista de clientes obtenidos
     return {"clientes": clientes}
 
@@ -109,3 +110,21 @@ async def update_data(id: str, cliente: ClienteEditarPydantic):
     response = response._asdict()
     # Devolver el cliente actualizado en el formato esperado (ClientePydantic)
     return ClientePydantic(**response)
+
+@clientesR.delete("/delete_costumer_by_id/{id_cliente}", status_code=204)
+def eliminar_cliente(doc_cliente: int, db: Session = Depends(get_db)):
+    # Obtener el cliente por su idCliente
+    cliente = db.query(Cliente_table).filter(Cliente_table.documento == doc_cliente).first()
+
+    # Verificar si el cliente existe
+    if not cliente:
+        raise HTTPException(status_code=404, detail="Cliente no encontrado")
+
+    # Eliminar el cliente estableciendo su estado como "INACTIVO"
+    cliente.estado = "INACTIVO"
+
+    # Confirmar los cambios en la base de datos
+    db.commit()
+
+    # Devolver una respuesta exitosa
+    return None
