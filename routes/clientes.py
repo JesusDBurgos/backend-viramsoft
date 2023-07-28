@@ -40,7 +40,7 @@ def search_costumer(id:str,db: Session = Depends(get_db)):
         dict: Un diccionario JSON con los datos del cliente encontrado.
     """
     # Construir la consulta SELECT utilizando SQLAlchemy
-    query = select(Cliente_table).where(Cliente_table.documento == id and Cliente_table.documento == "ACTIVO")
+    query = select(Cliente_table).where(Cliente_table.documento == id, Cliente_table.documento == "ACTIVO")
     # Ejecutar la consulta en la base de datos
     resultado = conn.execute(query)
     # Obtener el primer resultado de la consulta

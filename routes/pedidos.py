@@ -52,8 +52,11 @@ def create_order(pedido: PedidoAggPydantic, id: List[ProductosIdPydantic],
     db.refresh(db_pedido)
     valorTotalPed = 0.0
     for id,cantidad in zip(id,cantidadI):
-        producto_accedido = conn.execute(select(Producto_table).where(Producto_table.idProducto == id.id)).fetchone()
-        producto_accedido = producto_accedido._asdict()
+        # Verificar si el producto existe en la base de datos
+        existing_product = conn.execute(select(Producto_table).where(Producto_table.idProducto == id.id)).fetchone()
+        if not existing_product:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El producto no existe")
+        producto_accedido = existing_product._asdict()
         producto_accedido['idProducto'] = str(producto_accedido['idProducto'])
         producto_pydantic = ProductoPydantic(**producto_accedido)
         valorVenta = producto_pydantic.valorVenta * cantidad.cantidad
