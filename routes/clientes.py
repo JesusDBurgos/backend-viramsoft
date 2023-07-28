@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Response, status, HTTPException
+from fastapi.encoders import jsonable_encoder
 from config.database import conn,get_db
 from models.index import Cliente_table
 from schemas.index import ClientePydantic, ClienteEditarPydantic
@@ -20,9 +21,10 @@ def get_costumers(db: Session = Depends(get_db)):
     """
     # Consultar todos los clientes de la base de datos utilizando SQLAlchemy
     clientes = db.query(Cliente_table).select_from(Cliente_table).where(Cliente_table.estado == "ACTIVO")
-    #clientes = db.query(Cliente_table).all()
+    # Convertir el resultado en formato JSON serializable
+    clientes_json = jsonable_encoder({"clientes": clientes})
     # Devolver una respuesta JSON con la lista de clientes obtenidos
-    return {"clientes": clientes}
+    return clientes_json
 
 # Endpoint para buscar un cliente por su ID
 
