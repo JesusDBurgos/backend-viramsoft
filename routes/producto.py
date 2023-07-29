@@ -57,7 +57,7 @@ def search_product_by_category(categoria:str,db: Session = Depends(get_db)):
     return productos_response
 
 #Endpoint para buscar un producto por su ID 
-@productosR.get("/product/{id}",response_model=List[ProductoPydantic],summary="Este endpoint consulta un producto por su id", status_code=status.HTTP_200_OK,tags=["Productos"])
+@productosR.get("/product/{id}",summary="Este endpoint consulta un producto por su id", status_code=status.HTTP_200_OK,tags=["Productos"])
 def search_product_by_id(id:int,db: Session = Depends(get_db)):
     """
     Busca un producto por su Categoría.
