@@ -32,7 +32,7 @@ def get_products(db: Session = Depends(get_db)):
 # Endpoint para buscar un producto por su Categoria
 
 @productosR.get("/product/{categoria}",response_model=List[ProductoPydantic],summary="Este endpoint consulta un producto por su categoría", status_code=status.HTTP_200_OK,tags=["Productos"])
-def search_product(categoria:str,db: Session = Depends(get_db)):
+def search_product_by_category(categoria:str,db: Session = Depends(get_db)):
     """
     Busca un producto por su Categoría.
 
@@ -58,7 +58,7 @@ def search_product(categoria:str,db: Session = Depends(get_db)):
 
 #Endpoint para buscar un producto por su ID 
 @productosR.get("/product/{id}",response_model=List[ProductoPydantic],summary="Este endpoint consulta un producto por su id", status_code=status.HTTP_200_OK,tags=["Productos"])
-def search_product(id:str,db: Session = Depends(get_db)):
+def search_product_by_id(id:str,db: Session = Depends(get_db)):
     """
     Busca un producto por su Categoría.
 
@@ -75,11 +75,13 @@ def search_product(id:str,db: Session = Depends(get_db)):
     resultado = conn.execute(query)
     # Obtener el primer resultado de la consulta
     producto = resultado.fetchone()
+    print(producto)
     # Si no se encuentra el producto, devolver una respuesta 404
     if not producto:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El producto no existe")
     # Convertir los resultados en un objeto ProductoPydantic
-    return producto
+    producto_dict = producto._asdict()
+    return ProductoPydantic(**producto_dict)
 
 # Endpoint para crear un nuevo producto
 
