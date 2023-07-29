@@ -56,7 +56,7 @@ def search_costumer(id:str,db: Session = Depends(get_db)):
 # Endpoint para crear un nuevo producto
 
 @clientesR.post("/create_costumer",summary="Este endpoint crea un cliente",response_model=ClientePydantic,status_code=status.HTTP_201_CREATED,tags=["Clientes"])
-def create_product(cliente: ClientePydantic, db: Session = Depends(get_db)):
+def create_costumer(cliente: ClientePydantic, db: Session = Depends(get_db)):
     """
     Crea un nuevo cliente en la base de datos.
 
@@ -67,20 +67,36 @@ def create_product(cliente: ClientePydantic, db: Session = Depends(get_db)):
     Returns:
         dict: Un diccionario JSON con los datos del nuevo cliente creado.
     """
-    # Crear un nuevo objeto Cliente_table utilizando los datos proporcionados en el cuerpo de la solicitud
-    db_product = Cliente_table(documento = cliente.documento,
-                                nombre = cliente.nombre,
-                                direccion= cliente.direccion,
-                                telefono= cliente.telefono,
-                                estado = "ACTIVO")
-    # Agregar el nuevo producto a la sesión de la base de datos
-    db.add(db_product)
-    # Confirmar los cambios en la base de datos
-    db.commit()
-    # Refrescar el objeto para asegurarse de que los cambios se reflejen en el objeto en memoria
-    db.refresh(db_product)
-    # Devolver el nuevo producto creado en formato JSON
-    return db_product
+    # Buscar un cliente inactivo con el mismo número de documento
+    cliente_existente = db.query(Cliente_table).filter(Cliente_table.documento == cliente.documento, Cliente_table.estado == "INACTIVO").first()
+    if cliente_existente:
+        # Si se encuentra un cliente inactivo con el mismo número de documento,
+        # actualizar su estado a "ACTIVO" y los demás campos con la información proporcionada
+        cliente_existente.nombre = cliente.nombre
+        cliente_existente.direccion = cliente.direccion
+        cliente_existente.telefono = cliente.telefono
+        cliente_existente.estado = "ACTIVO"
+        # Confirmar los cambios en la base de datos
+        db.commit()
+        # Refrescar el objeto para asegurarse de que los cambios se reflejen en el objeto en memoria
+        db.refresh(cliente_existente)
+        # Devolver el cliente actualizado en formato JSON
+        return cliente_existente
+    else: 
+        # Crear un nuevo objeto Cliente_table utilizando los datos proporcionados en el cuerpo de la solicitud
+        db_product = Cliente_table(documento = cliente.documento,
+                                    nombre = cliente.nombre,
+                                    direccion= cliente.direccion,
+                                    telefono= cliente.telefono,
+                                    estado = "ACTIVO")
+        # Agregar el nuevo producto a la sesión de la base de datos
+        db.add(db_product)
+        # Confirmar los cambios en la base de datos
+        db.commit()
+        # Refrescar el objeto para asegurarse de que los cambios se reflejen en el objeto en memoria
+        db.refresh(db_product)
+        # Devolver el nuevo producto creado en formato JSON
+        return db_product
 
 # Endpoint para modificar un cliente
 
