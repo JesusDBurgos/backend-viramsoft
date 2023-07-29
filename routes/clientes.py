@@ -23,7 +23,7 @@ def get_costumers(db: Session = Depends(get_db)):
     # Convertir los resultados en una lista de diccionarios
     clientes_list = [cliente.__dict__ for cliente in clientes]
     # Devolver una respuesta JSON con la lista de clientes obtenidos
-    return clientes_list
+    return {"clientes":clientes_list}
 
 # Endpoint para buscar un cliente por su ID
 
