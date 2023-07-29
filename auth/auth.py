@@ -7,7 +7,7 @@ from config.database import get_db
 
 auth_router = APIRouter()
 
-@auth_router.post("/login")
+@auth_router.post("/login", summary="Este endpoint hace el login en la aplicacion", status_code=status.HTTP_202_ACCEPTED)
 def login(user_login: UserLogin, db: Session = Depends(get_db)):
     # Buscar al usuario en la base de datos por su nombre de usuario
     user = db.query(User).filter(User.username == user_login.username).first()
@@ -22,7 +22,7 @@ def login(user_login: UserLogin, db: Session = Depends(get_db)):
     access_token = create_access_token({"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
 
-@auth_router.post("/user_register")
+@auth_router.post("/user_register",summary="Este endpoint hace el registro del usuario en la base de datos y encripta la contraseña")
 def register(user_login: UserLogin, db: Session = Depends(get_db)):
     # Verificar si el nombre de usuario ya está en uso
     user = db.query(User).filter(User.username == user_login.username).first()

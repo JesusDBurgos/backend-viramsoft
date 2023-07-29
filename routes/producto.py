@@ -79,7 +79,7 @@ def search_product(id:str,db: Session = Depends(get_db)):
     if not producto:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El producto no existe")
     # Convertir los resultados en un objeto ProductoPydantic
-    return ProductoPydantic(**producto._asdict())
+    return producto
 
 # Endpoint para crear un nuevo producto
 
