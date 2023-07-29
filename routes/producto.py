@@ -73,7 +73,7 @@ def create_product(producto: ProductoPydantic, db: Session = Depends(get_db)):
     # Crear un nuevo objeto Producto_table utilizando los datos proporcionados en el cuerpo de la solicitud
     db_product = Producto_table(nombre = producto.nombre,marca = producto.marca,categoria= producto.categoria, cantidad = producto.cantidad, 
                           valorCompra= producto.valorCompra, valorVenta= producto.valorVenta,
-                          unidadMedida= producto.unidadMedida, fechaVencimiento= producto.fechaVencimiento)
+                          unidadMedida= producto.unidadMedida)
     # Agregar el nuevo producto a la sesión de la base de datos
     db.add(db_product)
     # Confirmar los cambios en la base de datos
@@ -98,8 +98,7 @@ async def update_data(id: str, producto: ProductoUpdatePydantic):
         cantidad = producto.cantidad,
         valorCompra = producto.valorCompra,
         valorVenta = producto.valorVenta,
-        unidadMedida = producto.unidadMedida,
-        fechaVencimiento = producto.fechaVencimiento)
+        unidadMedida = producto.unidadMedida)
     try:
         # Ejecutar la consulta para actualizar el producto en la base de datos
         conn.execute(query)

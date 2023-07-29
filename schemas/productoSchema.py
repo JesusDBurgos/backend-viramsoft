@@ -11,7 +11,6 @@ class ProductoPydantic(BaseModel):
     valorCompra: int = 4200
     valorVenta: int = 6500
     unidadMedida: str = "500ML"
-    fechaVencimiento: date = date(2023, 7, 19)
 
 class ProductoUpdatePydantic(BaseModel):
     nombre: str = "Varsol"
@@ -20,7 +19,6 @@ class ProductoUpdatePydantic(BaseModel):
     valorCompra: int = 4200
     valorVenta: int = 6500
     unidadMedida: str = "500ML"
-    fechaVencimiento: date = date(2023, 7, 19)
 
 class CantidadPydantic(BaseModel):
     cantidad: int

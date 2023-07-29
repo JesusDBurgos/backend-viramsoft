@@ -13,7 +13,6 @@ class Producto_table(Base):
     valorCompra = Column(Integer,nullable=False)
     valorVenta = Column(Integer,nullable=False)
     unidadMedida = Column(String(255),nullable=False)
-    fechaVencimiento = Column(Date)
 
 
 #Base.metadata.create_all(engine)

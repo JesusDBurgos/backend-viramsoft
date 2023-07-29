@@ -70,18 +70,21 @@ def create_costumer(cliente: ClientePydantic, db: Session = Depends(get_db)):
     # Buscar un cliente inactivo con el mismo número de documento
     cliente_existente = db.query(Cliente_table).filter(Cliente_table.documento == cliente.documento, Cliente_table.estado == "INACTIVO").first()
     if cliente_existente:
-        # Si se encuentra un cliente inactivo con el mismo número de documento,
-        # actualizar su estado a "ACTIVO" y los demás campos con la información proporcionada
-        cliente_existente.nombre = cliente.nombre
-        cliente_existente.direccion = cliente.direccion
-        cliente_existente.telefono = cliente.telefono
-        cliente_existente.estado = "ACTIVO"
-        # Confirmar los cambios en la base de datos
-        db.commit()
-        # Refrescar el objeto para asegurarse de que los cambios se reflejen en el objeto en memoria
-        db.refresh(cliente_existente)
-        # Devolver el cliente actualizado en formato JSON
-        return cliente_existente
+        if cliente_existente.estado == "INACTIVO":
+            # Si se encuentra un cliente inactivo con el mismo número de documento,
+            # actualizar su estado a "ACTIVO" y los demás campos con la información proporcionada
+            cliente_existente.nombre = cliente.nombre
+            cliente_existente.direccion = cliente.direccion
+            cliente_existente.telefono = cliente.telefono
+            cliente_existente.estado = "ACTIVO"
+            # Confirmar los cambios en la base de datos
+            db.commit()
+            # Refrescar el objeto para asegurarse de que los cambios se reflejen en el objeto en memoria
+            db.refresh(cliente_existente)
+            # Devolver el cliente actualizado en formato JSON
+            return cliente_existente
+        # Si el cliente ya existe y está activo, se devuelve un error indicando que ya está registrado
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El cliente ya está registrado y activo.")
     else: 
         # Crear un nuevo objeto Cliente_table utilizando los datos proporcionados en el cuerpo de la solicitud
         db_product = Cliente_table(documento = cliente.documento,
