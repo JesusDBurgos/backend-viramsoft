@@ -40,7 +40,7 @@ def search_costumer(id:str,db: Session = Depends(get_db)):
         dict: Un diccionario JSON con los datos del cliente encontrado.
     """
     # Construir la consulta SELECT utilizando SQLAlchemy
-    query = select(Cliente_table).where(Cliente_table.documento == id, Cliente_table.documento == "ACTIVO")
+    query = select(Cliente_table).where(Cliente_table.documento == id, Cliente_table.estado == "ACTIVO")
     # Ejecutar la consulta en la base de datos
     resultado = conn.execute(query)
     # Obtener el primer resultado de la consulta
@@ -129,7 +129,7 @@ async def update_data(id: str, cliente: ClienteEditarPydantic):
     return ClientePydantic(**response)
 
 @clientesR.delete("/delete_costumer_by_id/{id_cliente}", status_code=204)
-def eliminar_cliente(doc_cliente: int, db: Session = Depends(get_db)):
+def delete_cliente(doc_cliente: int, db: Session = Depends(get_db)):
     # Obtener el cliente por su idCliente
     cliente = db.query(Cliente_table).filter(Cliente_table.documento == doc_cliente).first()
 
