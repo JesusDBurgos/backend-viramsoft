@@ -3,7 +3,7 @@ from config.database import conn,get_db
 from models.index import Cliente_table
 from schemas.index import ClientePydantic, ClienteEditarPydantic
 from sqlalchemy.orm import Session
-from sqlalchemy import select,update
+from sqlalchemy import select,update, and_
 
 clientesR = APIRouter()
 
@@ -40,7 +40,7 @@ def search_costumer(id:str,db: Session = Depends(get_db)):
         dict: Un diccionario JSON con los datos del cliente encontrado.
     """
     # Construir la consulta SELECT utilizando SQLAlchemy
-    query = select(Cliente_table).where(Cliente_table.documento == id and Cliente_table.estado == "ACTIVO")
+    query = select(Cliente_table).where(and_(Cliente_table.documento == id, Cliente_table.estado == "ACTIVO"))
     # Ejecutar la consulta en la base de datos
     resultado = conn.execute(query)
     # Obtener el primer resultado de la consulta
