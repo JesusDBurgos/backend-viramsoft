@@ -56,6 +56,31 @@ def search_product(categoria:str,db: Session = Depends(get_db)):
     productos_response = [ProductoPydantic(**producto._asdict()) for producto in productos]
     return productos_response
 
+#Endpoint para buscar un producto por su ID 
+@productosR.get("/product/{id}",response_model=List[ProductoPydantic],summary="Este endpoint consulta un producto por su id", status_code=status.HTTP_200_OK,tags=["Productos"])
+def search_product(id:str,db: Session = Depends(get_db)):
+    """
+    Busca un producto por su Categoría.
+
+    Args:
+        categoria (str): categoría de los productos a buscar.
+        db (Session): Objeto de sesión de la base de datos.
+
+    Returns:
+        dict: Un diccionario JSON con los datos del producto encontrado.
+    """
+    # Construir la consulta SELECT utilizando SQLAlchemy
+    query = select(Producto_table).where(Producto_table.idProducto == id)
+    # Ejecutar la consulta en la base de datos
+    resultado = conn.execute(query)
+    # Obtener el primer resultado de la consulta
+    producto = resultado.fetchone()
+    # Si no se encuentra el producto, devolver una respuesta 404
+    if not producto:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El producto no existe")
+    # Convertir los resultados en un objeto ProductoPydantic
+    return ProductoPydantic(**producto._asdict())
+
 # Endpoint para crear un nuevo producto
 
 @productosR.post("/create_product",summary="Este endpoint crea un producto",status_code=status.HTTP_201_CREATED,tags=["Productos"])
