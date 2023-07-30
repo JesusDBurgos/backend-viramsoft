@@ -70,7 +70,7 @@ def search_product_by_id(id:int):
         dict: Un diccionario JSON con los datos del producto encontrado.
     """
     # Ejecutar la consulta en la base de datos
-    producto = conn.execute(select(Producto_table).where(Producto_table.idProducto == id)).fetchone()
+    producto = conn.execute(select(Producto_table).where(Producto_table.idProducto == id)).fetchall()
     print(producto)
     # Si no se encuentra el producto, devolver una respuesta 404
     if not producto:
