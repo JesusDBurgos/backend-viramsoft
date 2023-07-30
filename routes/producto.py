@@ -79,12 +79,11 @@ def search_product_by_id(id:int,db: Session = Depends(get_db)):
     # Si no se encuentra el producto, devolver una respuesta 404
     if not producto:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El producto no existe")
-    # Convertir el resultado en un diccionario
-    producto_dict = producto._asdict()
-    # Crear una instancia de ProductoPydantic utilizando el diccionario
-    #producto_pydantic = 
+    # Convertir el resultado en un diccionario para el ID
+    response = producto._asdict()
+    response['idProducto'] = str(response['idProducto'])
     # Devolver el producto encontrado en formato JSON utilizando el modelo ProductoPydantic
-    return ProductoPydantic(**producto_dict)
+    return ProductoPydantic(**response)
 
 # Endpoint para crear un nuevo producto
 
