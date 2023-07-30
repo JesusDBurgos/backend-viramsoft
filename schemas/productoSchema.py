@@ -20,6 +20,10 @@ class ProductoUpdatePydantic(BaseModel):
 class CantidadPydantic(BaseModel):
     cantidad: int
 
+class ProductosPedAggPydantic(BaseModel):
+    idProducto: int
+    cantidad: int
+
 class ProductosIdPydantic(BaseModel):
     id: int
 

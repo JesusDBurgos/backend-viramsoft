@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends,status, Response, HTTPException
 from config.database import conn,get_db
 from models.index import Pedido_table,DetallePedido_table, Producto_table
-from schemas.index import PedidoAggPydantic,ProductoPydantic, CantidadPydantic, ProductosIdPydantic
+from schemas.index import PedidoAggPydantic,ProductoPydantic, ProductosPedAggPydantic 
 from sqlalchemy.orm import Session
 from sqlalchemy import select,update
 from datetime import datetime
@@ -31,8 +31,8 @@ def get_orders(db: Session = Depends(get_db)):
     return {"pedidos": orders}
 
 @pedidosR.post("/create_order",summary="Este endpoint crea un pedido",status_code=status.HTTP_201_CREATED,tags=["Pedido"])
-def create_order(pedido: PedidoAggPydantic, id: List[ProductosIdPydantic],
-                 db: Session = Depends(get_db), cantidadI: List[CantidadPydantic] = None):
+def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydantic] = None,
+                 db: Session = Depends(get_db)):
     # Obtener la fecha actual
     fecha_actual = datetime.now()
     fecha_pedido = fecha_actual.strftime("%Y-%m-%d")
@@ -51,21 +51,21 @@ def create_order(pedido: PedidoAggPydantic, id: List[ProductosIdPydantic],
     # Refrescar el objeto para asegurarse de que los cambios se reflejen en el objeto en memoria
     db.refresh(db_pedido)
     valorTotalPed = 0.0
-    for id,cantidad in zip(id,cantidadI):
+    for producto in productos:
         # Verificar si el producto existe en la base de datos
-        existing_product = conn.execute(select(Producto_table).where(Producto_table.idProducto == id.id)).fetchone()
+        existing_product = conn.execute(select(Producto_table).where(Producto_table.idProducto == producto.idProducto)).fetchone()
         if not existing_product:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El producto no existe")
         producto_accedido = existing_product._asdict()
         producto_accedido['idProducto'] = str(producto_accedido['idProducto'])
         producto_pydantic = ProductoPydantic(**producto_accedido)
-        valorVenta = producto_pydantic.valorVenta * cantidad.cantidad
+        valorVenta = producto_pydantic.valorVenta * producto.cantidad
         valorTotalPed += valorVenta
         db_productos = DetallePedido_table(
                                             idDetalle = db_pedido.idPedido,
                                             idPedido = db_pedido.idPedido,
                                             idProducto = producto_pydantic.idProducto,
-                                            cantidad = cantidad.cantidad,
+                                            cantidad = producto.cantidad,
                                             precio = valorVenta
                                         )
         # Agregar el nuevo producto a la sesión de la base de datos
