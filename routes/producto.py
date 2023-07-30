@@ -72,7 +72,7 @@ def search_product_by_id(id:int,db: Session = Depends(get_db)):
     # Construir la consulta SELECT utilizando SQLAlchemy
     query = select(Producto_table).where(Producto_table.idProducto == id)
     # Ejecutar la consulta en la base de datos
-    resultado = conn.execute(query).first()
+    resultado = conn.execute(query).fetchone
     # Obtener el primer resultado de la consulta
     producto = resultado
     print(producto)
@@ -82,9 +82,9 @@ def search_product_by_id(id:int,db: Session = Depends(get_db)):
     # Convertir el resultado en un diccionario
     producto_dict = producto._asdict()
     # Crear una instancia de ProductoPydantic utilizando el diccionario
-    producto_pydantic = ProductoPydantic(**producto_dict)
+    #producto_pydantic = 
     # Devolver el producto encontrado en formato JSON utilizando el modelo ProductoPydantic
-    return {"producto": producto_pydantic }
+    return ProductoPydantic(**producto_dict)
 
 # Endpoint para crear un nuevo producto
 
