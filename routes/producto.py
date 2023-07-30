@@ -79,8 +79,12 @@ def search_product_by_id(id:int,db: Session = Depends(get_db)):
     # Si no se encuentra el producto, devolver una respuesta 404
     if not producto:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El producto no existe")
-    # Convertir los resultados en un objeto ProductoPydantic
-    return {"producto": producto }
+    # Convertir el resultado en un diccionario
+    producto_dict = producto._asdict()
+    # Crear una instancia de ProductoPydantic utilizando el diccionario
+    producto_pydantic = ProductoPydantic(**producto_dict)
+    # Devolver el producto encontrado en formato JSON utilizando el modelo ProductoPydantic
+    return {"producto": producto_pydantic }
 
 # Endpoint para crear un nuevo producto
 
@@ -110,8 +114,8 @@ def create_product(producto: ProductoPydantic, db: Session = Depends(get_db)):
     return db_product
 
 # Definir el endpoint para actualizar un producto por su ID
-@productosR.put("/edit_product/{id}",response_model=ProductoUpdatePydantic, status_code=status.HTTP_200_OK, tags=["Productos"])
-async def update_data(id: str, producto: ProductoUpdatePydantic):
+@productosR.put("/edit_product/{id}",response_model=ProductoPydantic, status_code=status.HTTP_200_OK, tags=["Productos"])
+async def update_data(id: int, producto: ProductoUpdatePydantic):
     # Verificar si el producto existe en la base de datos
     existing_product = conn.execute(select(Producto_table).where(Producto_table.idProducto == id)).fetchone()
     if not existing_product:
