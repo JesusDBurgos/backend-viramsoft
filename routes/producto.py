@@ -117,12 +117,9 @@ async def update_data(id: int, producto: ProductoUpdatePydantic):
     
     # Crear la consulta para actualizar el producto en la base de datos
     query = update(Producto_table).where(Producto_table.idProducto == id).values(
-        nombre = producto.nombre,
-        marca = producto.marca,
         cantidad = producto.cantidad,
         valorCompra = producto.valorCompra,
-        valorVenta = producto.valorVenta,
-        unidadMedida = producto.unidadMedida)
+        valorVenta = producto.valorVenta)
     try:
         # Ejecutar la consulta para actualizar el producto en la base de datos
         conn.execute(query)

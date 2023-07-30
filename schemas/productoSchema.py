@@ -13,13 +13,10 @@ class ProductoPydantic(BaseModel):
     unidadMedida: str = "500ML"
 
 class ProductoUpdatePydantic(BaseModel):
-    nombre: str = "Varsol"
-    marca: str = "P&G"
     cantidad: int = 15
     valorCompra: int = 4200
     valorVenta: int = 6500
-    unidadMedida: str = "500ML"
-
+    
 class CantidadPydantic(BaseModel):
     cantidad: int
 
