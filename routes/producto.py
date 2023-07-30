@@ -72,9 +72,9 @@ def search_product_by_id(id:int,db: Session = Depends(get_db)):
     # Construir la consulta SELECT utilizando SQLAlchemy
     query = select(Producto_table).where(Producto_table.idProducto == id)
     # Ejecutar la consulta en la base de datos
-    resultado = conn.execute(query).fetchone
+    resultado = conn.execute(query)
     # Obtener el primer resultado de la consulta
-    producto = resultado
+    producto = resultado.fetchone
     print(producto)
     # Si no se encuentra el producto, devolver una respuesta 404
     if not producto:
