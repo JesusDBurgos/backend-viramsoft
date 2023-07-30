@@ -58,32 +58,27 @@ def search_product_by_category(categoria:str,db: Session = Depends(get_db)):
 
 #Endpoint para buscar un producto por su ID 
 @productosR.get("/product/{id}",summary="Este endpoint consulta un producto por su id", status_code=status.HTTP_200_OK,tags=["Productos"])
-def search_product_by_id(id:int,db: Session = Depends(get_db)):
+def search_product_by_id(id:int):
     """
-    Busca un producto por su Categoría.
+    Busca un producto por su Id.
 
     Args:
-        categoria (str): categoría de los productos a buscar.
+        id (int): id de los productos a buscar.
         db (Session): Objeto de sesión de la base de datos.
 
     Returns:
         dict: Un diccionario JSON con los datos del producto encontrado.
     """
-    # Construir la consulta SELECT utilizando SQLAlchemy
-    query = select(Producto_table).where(Producto_table.idProducto == id)
     # Ejecutar la consulta en la base de datos
-    resultado = conn.execute(query)
-    # Obtener el primer resultado de la consulta
-    producto = resultado.fetchone()
+    producto = conn.execute(select(Producto_table).where(Producto_table.idProducto == id)).fetchone()
     print(producto)
     # Si no se encuentra el producto, devolver una respuesta 404
     if not producto:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El producto no existe")
     # Convertir el resultado en un diccionario para el ID
-    response = producto._asdict()
-    response['idProducto'] = str(response['idProducto'])
+    #response = producto._asdict()
     # Devolver el producto encontrado en formato JSON utilizando el modelo ProductoPydantic
-    return ProductoPydantic(**response)
+    return ProductoPydantic(**producto)
 
 # Endpoint para crear un nuevo producto
 
