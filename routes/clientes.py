@@ -121,7 +121,9 @@ def update_data(id: str, cliente: ClienteEditarPydantic):
                     direccion= cliente.direccion,
                     telefono= cliente.telefono)
     # Ejecutar la consulta para actualizar el cliente en la base de datos
-    cliente = conn.execute(query)
+    conn.execute(query)
+    # Realizar el commit para guardar los cambios en la base de datos
+    conn.commit()
     # Crear una consulta para obtener el cliente actualizado
     response = select(Cliente_table).where(Cliente_table.documento == id)
     # Ejecutar la consulta para obtener el cliente actualizado de la base de datos
