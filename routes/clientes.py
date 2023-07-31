@@ -104,7 +104,7 @@ def create_costumer(cliente: ClientePydantic, db: Session = Depends(get_db)):
 # Endpoint para modificar un cliente
 
 @clientesR.put("/edit_costumer/{id}",response_model=ClienteEditarPydantic, status_code=status.HTTP_200_OK, tags=["Clientes"])
-async def update_data(id: str, cliente: ClienteEditarPydantic):
+def update_data(id: str, cliente: ClienteEditarPydantic):
     """
     Modifica un cliente de la base de datos.
 

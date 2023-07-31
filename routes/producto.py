@@ -109,7 +109,7 @@ def create_product(producto: ProductoPydantic, db: Session = Depends(get_db)):
 
 # Definir el endpoint para actualizar un producto por su ID
 @productosR.put("/edit_product/{id}",response_model=ProductoPydantic, status_code=status.HTTP_200_OK, tags=["Productos"])
-async def update_data(id: int, producto: ProductoUpdatePydantic):
+def update_data(id: int, producto: ProductoUpdatePydantic):
     # Verificar si el producto existe en la base de datos
     existing_product = conn.execute(select(Producto_table).where(Producto_table.idProducto == id)).fetchone()
     if not existing_product:
@@ -123,6 +123,9 @@ async def update_data(id: int, producto: ProductoUpdatePydantic):
     try:
         # Ejecutar la consulta para actualizar el producto en la base de datos
         conn.execute(query)
+
+        # Realizar el commit para guardar los cambios en la base de datos
+        conn.commit()
 
         # Crear una consulta para obtener el producto actualizado
         response = select(Producto_table).where(Producto_table.idProducto == id)
