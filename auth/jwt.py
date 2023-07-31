@@ -5,16 +5,16 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 
-# Clave secreta para firmar los tokens (debería ser un secreto bien guardado)
+# Clave secreta para firmar los tokens
 SECRET_KEY = os.getenv("SECRET_KEY")
 
-# Crea una instancia de OAuth2PasswordBearer para obtener el token JWT desde el encabezado de autorización
+# Instancia de OAuth2PasswordBearer para obtener el token JWT desde el encabezado de autorización
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # Algoritmo de codificación utilizado para los tokens
 ALGORITHM = "HS256"
 
-# Tiempo de expiración de los tokens (por ejemplo, 1 hora)
+# Tiempo de expiración de los tokens
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
