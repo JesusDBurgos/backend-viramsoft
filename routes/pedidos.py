@@ -62,7 +62,6 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
         valorVenta = producto_pydantic.valorVenta * producto.cantidad
         valorTotalPed += valorVenta
         db_productos = DetallePedido_table(
-                                            idDetalle = db_pedido.idPedido,
                                             idPedido = db_pedido.idPedido,
                                             idProducto = producto_pydantic.idProducto,
                                             cantidad = producto.cantidad,
