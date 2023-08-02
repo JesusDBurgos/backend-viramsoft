@@ -68,10 +68,6 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
                                             cantidad = producto.cantidad,
                                             precio = valorVenta
                                         )
-        # Agregar el nuevo producto a la sesión de la base de datos
-        db.add(db_productos)
-        #Refrescar el objeto para asegurarse de que los cambios se reflejen en el objeto en memoria
-        db.refresh(db_productos)
         print(db_productos)
     db_pedido.valorTotal = valorTotalPed
     print(db_pedido.idPedido,valorTotalPed)
