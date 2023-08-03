@@ -5,8 +5,12 @@ from schemas.index import ProductoPydantic,ProductoUpdatePydantic, ProductosCatP
 from sqlalchemy.orm import Session
 from sqlalchemy import select,update
 from typing import List
+import locale
 
 productosR = APIRouter()
+
+# Establecer el formato de localización para formatear los números sin decimales y sin separadores de miles
+    locale.setlocale(locale.LC_ALL, "es_ES.utf8")
 
 # Endpoint para obtener todos los productos
 
@@ -34,8 +38,8 @@ def get_products(db: Session = Depends(get_db)):
             "marca": product.marca,
             "categoria": product.categoria,
             "cantidad": product.cantidad,
-            "valorCompra": "{:,.2f}".format(product.valorCompra),
-            "valorVenta": "{:,.2f}".format(product.valorVenta),
+            "valorCompra": locale.format_string("%.0f", product.valorCompra, grouping=True),
+            "valorVenta": locale.format_string("%.0f", product.valorVenta, grouping=True),
             "unidadMedida": product.unidadMedida
         }
         productos_formateados.append(producto_dict)
