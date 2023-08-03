@@ -9,9 +9,6 @@ import locale
 
 productosR = APIRouter()
 
-# Establecer el formato de localización para formatear los números sin decimales y sin separadores de miles
-locale.setlocale(locale.LC_ALL, "es_ES.utf8")
-
 # Endpoint para obtener todos los productos
 
 @productosR.get("/product", status_code=status.HTTP_200_OK,summary="Este endpoint consulta todos los productos", tags=["Productos"])
@@ -30,21 +27,8 @@ def get_products(db: Session = Depends(get_db)):
     # Verificar si hay productos. Si no hay productos, lanzar una excepción 404 (Not Found)
     if not products:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No se encontraron productos")
-    # Formatear los valores de valorCompra y valorVenta en cada producto
-    productos_formateados = []
-    for product in products:
-        producto_dict = {
-            "nombre": product.nombre,
-            "marca": product.marca,
-            "categoria": product.categoria,
-            "cantidad": product.cantidad,
-            "valorCompra": locale.format_string("%.0f", product.valorCompra, grouping=True),
-            "valorVenta": locale.format_string("%.0f", product.valorVenta, grouping=True),
-            "unidadMedida": product.unidadMedida
-        }
-        productos_formateados.append(producto_dict)
     # Devolver una respuesta JSON con la lista de productos obtenidos
-    return {"productos": productos_formateados}
+    return {"productos": products}
 
 # Endpoint para buscar un producto por su Categoria
 
