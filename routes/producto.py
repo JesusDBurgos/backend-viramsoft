@@ -10,7 +10,7 @@ import locale
 productosR = APIRouter()
 
 # Establecer el formato de localización para formatear los números sin decimales y sin separadores de miles
-locale.setlocale(locale.LC_ALL, "es_ES.utf8")
+locale.setlocale(locale.LC_ALL, "en_US.utf8")
 
 # Endpoint para obtener todos los productos
 
