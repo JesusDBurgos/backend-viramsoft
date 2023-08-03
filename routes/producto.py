@@ -26,8 +26,21 @@ def get_products(db: Session = Depends(get_db)):
     # Verificar si hay productos. Si no hay productos, lanzar una excepción 404 (Not Found)
     if not products:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No se encontraron productos")
+    # Formatear los valores de valorCompra y valorVenta en cada producto
+    productos_formateados = []
+    for product in products:
+        producto_dict = {
+            "nombre": product.nombre,
+            "marca": product.marca,
+            "categoria": product.categoria,
+            "cantidad": product.cantidad,
+            "valorCompra": "{:,.2f}".format(product.valorCompra),
+            "valorVenta": "{:,.2f}".format(product.valorVenta),
+            "unidadMedida": product.unidadMedida
+        }
+        productos_formateados.append(producto_dict)
     # Devolver una respuesta JSON con la lista de productos obtenidos
-    return {"productos": products}
+    return {"productos": productos_formateados}
 
 # Endpoint para buscar un producto por su Categoria
 
