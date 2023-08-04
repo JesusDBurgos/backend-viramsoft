@@ -27,6 +27,10 @@ def get_products(db: Session = Depends(get_db)):
     # Verificar si hay productos. Si no hay productos, lanzar una excepción 404 (Not Found)
     if not products:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No se encontraron productos")
+     # Formatear los precios en formato de moneda colombiana (1.456.789)
+    for product in products:
+        product.valorVenta = "{:,.0f}".format(product.valorVenta).replace(",", ".")
+        product.valorCompra = "{:,.0f}".format(product.valorCompra).replace(",", ".")
     # Devolver una respuesta JSON con la lista de productos obtenidos
     return {"productos": products}
 
