@@ -27,6 +27,9 @@ def get_orders(db: Session = Depends(get_db)):
     # Verificar si hay productos. Si no hay productos, lanzar una excepción 404 (Not Found)
     if not orders:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No se encontraron pedidos")
+    # Formatear el precio en formato de moneda
+    for order in orders:
+        order.valorTotal = "{:,.0f}".format(order.valorTotal).replace(",", ".")
     # Devolver una respuesta JSON con la lista de productos obtenidos
     return {"pedidos": orders}
 
