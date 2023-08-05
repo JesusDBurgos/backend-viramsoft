@@ -121,7 +121,7 @@ def create_product(producto: ProductoPydantic, db: Session = Depends(get_db)):
 
 # Definir el endpoint para actualizar un producto por su ID
 @productosR.put("/edit_product/{id}",response_model=ProductoPydantic, status_code=status.HTTP_200_OK, tags=["Productos"])
-def update_data(id: int, producto: ProductoUpdatePydantic):
+def update_data(id: int, producto: ProductoUpdatePydantic,db: Session = Depends(get_db)):
     # Verificar si el producto existe en la base de datos
     existing_product = conn.execute(select(Producto_table).where(Producto_table.idProducto == id)).fetchone()
     if not existing_product:
@@ -134,27 +134,19 @@ def update_data(id: int, producto: ProductoUpdatePydantic):
         valorVenta = producto.valorVenta)
     try:
         # Ejecutar la consulta para actualizar el producto en la base de datos
-        conn.execute(query)
+        db.execute(query)
 
         # Realizar el commit para guardar los cambios en la base de datos
-        conn.commit()
+        db.commit()
 
         # Crear una consulta para obtener el producto actualizado
-        response = select(Producto_table).where(Producto_table.idProducto == id)
-
-        # Ejecutar la consulta para obtener el producto actualizado de la base de datos
-        response = conn.execute(response).fetchone()
-        print(response)
-        # Convertir el resultado en un diccionario para modificar el formato de la fecha, del ID y de los valores del producto
-        response = response._asdict()
+        updated_product = db.query(Producto_table).filter(Producto_table.idProducto == id).first()
         # Formatear los precios en formato de moneda
-        response['valorVenta'] = "{:,.0f}".format(response['valorVenta']).replace(",", ".")
-        response['valorCompra'] = "{:,.0f}".format(response['valorCompra']).replace(",", ".")
-        response['idProducto'] = str(response['idProducto'])
+        updated_product.valorVenta = "{:,.0f}".format(updated_product.valorVenta).replace(",", ".")
+        updated_product.valorCompra = "{:,.0f}".format(updated_product.valorCompra).replace(",", ".")
 
         # Devolver el producto actualizado en el formato esperado (ProductoPydantic)
-        return ProductoPydantic(**response)
-
+        return updated_product
     except Exception as e:
         # Manejar errores en la base de datos u otros errores inesperados
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error interno del servidor")
