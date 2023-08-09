@@ -90,7 +90,7 @@ def search_product_by_id(id:int):
     response['valorVenta'] = "{:,.0f}".format(response['valorVenta']).replace(",", ".")
     response['valorCompra'] = "{:,.0f}".format(response['valorCompra']).replace(",", ".")
     # Devolver el producto encontrado en formato JSON utilizando el modelo ProductoPydantic
-    return ProductoPydantic(**response)
+    return response
 
 # Endpoint para crear un nuevo producto
 
