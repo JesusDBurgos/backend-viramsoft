@@ -27,10 +27,6 @@ def get_products(db: Session = Depends(get_db)):
     # Verificar si hay productos. Si no hay productos, lanzar una excepción 404 (Not Found)
     if not products:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No se encontraron productos")
-    # Formatear los precios en formato de moneda
-    for product in products:
-        product.valorVenta = "{:,.0f}".format(product.valorVenta).replace(",", ".")
-        product.valorCompra = "{:,.0f}".format(product.valorCompra).replace(",", ".")
     # Devolver una respuesta JSON con la lista de productos obtenidos
     return {"productos": products}
 
@@ -59,10 +55,6 @@ def search_product_by_category(categoria:str,db: Session = Depends(get_db)):
         return []
     # Convertir los resultados en una lista de instancias de ProductoPydantic
     productos_response = [ProductoPydantic(**producto._asdict()) for producto in productos]
-    # Formatear los precios en formato de moneda
-    for producto in productos_response:
-        producto.valorVenta = "{:,.0f}".format(producto.valorVenta).replace(",", ".")
-        producto.valorCompra = "{:,.0f}".format(producto.valorCompra).replace(",", ".")
     return productos_response
 
 #Endpoint para buscar un producto por su ID 
@@ -86,9 +78,6 @@ def search_product_by_id(id:int):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El producto no existe")
     # Convertir el resultado en un diccionario para el ID
     response = producto._asdict()
-    # Formatear los precios en formato de moneda
-    response['valorVenta'] = "{:,.0f}".format(response['valorVenta']).replace(",", ".")
-    response['valorCompra'] = "{:,.0f}".format(response['valorCompra']).replace(",", ".")
     # Devolver el producto encontrado en formato JSON utilizando el modelo ProductoPydantic
     return response
 
@@ -141,10 +130,7 @@ def update_data(id: int, producto: ProductoUpdatePydantic,db: Session = Depends(
 
         # Crear una consulta para obtener el producto actualizado
         updated_product = db.query(Producto_table).filter(Producto_table.idProducto == id).first()
-        # Formatear los precios en formato de moneda
-        updated_product.valorVenta = "{:,.0f}".format(updated_product.valorVenta).replace(",", ".")
-        updated_product.valorCompra = "{:,.0f}".format(updated_product.valorCompra).replace(",", ".")
-
+        
         # Devolver el producto actualizado en el formato esperado (ProductoPydantic)
         return updated_product
     except Exception as e:
