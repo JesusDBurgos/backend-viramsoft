@@ -36,11 +36,12 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
     # Obtener la fecha actual
     fecha_actual = datetime.now()
     fecha_pedido = fecha_actual.strftime("%Y-%m-%d")
+    fecha_entrega_str = pedido.fechaEntrega.strftime("%Y-%m-%d")
     db_pedido = Pedido_table(
                               documentoCliente = pedido.documentoCliente,
                               observacion = pedido.observacion,
                               fechaPedido= fecha_pedido,
-                              fechaEntrega= pedido.fechaEntrega,
+                              fechaEntrega= fecha_entrega_str,
                               valorTotal = 0,
                               estado= "Pendiente",
                             )
