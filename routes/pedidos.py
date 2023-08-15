@@ -57,9 +57,9 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
         existing_product = db.query(Producto_table).filter(Producto_table.idProducto == producto.idProducto).first()
         if not existing_product:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El producto no existe")
-        producto_accedido = existing_product._asdict()
-        producto_accedido['idProducto'] = str(producto_accedido['idProducto'])
-        producto_pydantic = ProductoPydantic(**producto_accedido)
+        producto_accedido = existing_product 
+        producto_accedido.idProducto = str(producto_accedido.idProducto)
+        producto_pydantic = ProductoPydantic(**producto_accedido.__dict__)
         valorVenta = producto_pydantic.valorVenta * producto.cantidad
         valorTotalPed += valorVenta
         db_productos = DetallePedido_table(
