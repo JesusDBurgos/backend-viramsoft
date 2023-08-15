@@ -78,7 +78,5 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
     db_pedido.valorTotal = valorTotalPed
     # Realiza el commit de los cambios en la sesión
     db.commit()
-    #Refrescar el objeto para asegurarse de que los cambios se reflejen en el objeto en memoria
-    db.refresh(db_productos)
 
     return Response(status_code=status.HTTP_201_CREATED, content="Pedido creado exitosamente")
