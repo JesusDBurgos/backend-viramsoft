@@ -70,14 +70,14 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
         db_productos = DetallePedido_table(
                                             idDetalle = id_detalle,
                                             idPedido = db_pedido.idPedido,
-                                            idProducto = producto_pydantic.idProducto,
+                                            idProducto = producto_accedido.idProducto,
                                             cantidad = producto.cantidad,
                                             precio = valorVenta
                                         )
         # Agrega db_productos a la lista
         lista_productos.append(db_productos)
     # Realiza la inserción de los detalles del pedido en una sola operación
-    db.bulk_save_objects(lista_productos)
+    db.bulk_save_objects(lista_productos, return_defaults=True)
     # Actualiza el valor total del pedido
     db_pedido.valorTotal = valorTotalPed
     # Realiza el commit de los cambios en la sesión
