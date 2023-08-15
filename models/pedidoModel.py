@@ -11,3 +11,5 @@ class Pedido_table(Base):
     fechaEntrega = Column(Date,nullable=False )
     valorTotal = Column(Float, nullable=False)
     estado = Column(String(255), nullable=False)
+    s
+    detalles = relationship("DetallePedido_table", back_populates="pedido")

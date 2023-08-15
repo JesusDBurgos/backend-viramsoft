@@ -14,6 +14,9 @@ class Producto_table(Base):
     valorVenta = Column(Integer,nullable=False)
     unidadMedida = Column(String(255),nullable=False)
 
+    detalles = relationship("DetallePedido_table", back_populates="producto")
+
+
 
 #Base.metadata.create_all(engine)
 
