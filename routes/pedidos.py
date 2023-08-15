@@ -55,7 +55,7 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
     lista_productos = []  # Crear una lista para los objetos DetallePedido_table
     for producto in productos:
         # Verificar si el producto existe en la base de datos
-        existing_product = conn.execute(select(Producto_table).where(Producto_table.idProducto == producto.idProducto)).fetchone()
+        existing_product = db.query(Producto_table).filter(Producto_table.idProducto == producto.idProducto).first()
         if not existing_product:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El producto no existe")
         producto_accedido = existing_product._asdict()
