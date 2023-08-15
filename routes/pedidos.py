@@ -5,6 +5,7 @@ from schemas.index import PedidoAggPydantic,ProductoPydantic, ProductosPedAggPyd
 from sqlalchemy.orm import Session
 from sqlalchemy import select,update
 from datetime import datetime
+from itertools import count
 from typing import List
 
 pedidosR = APIRouter()
@@ -51,6 +52,8 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
     # Refrescar el objeto para asegurarse de que los cambios se reflejen en el objeto en memoria
     db.refresh(db_pedido)
     valorTotalPed = 0.0
+    # Inicializar un contador para generar idDetalle únicos
+    id_detalle_counter = count(start=1)
     lista_productos = []  # Crear una lista para los objetos DetallePedido_table
     for producto in productos:
         # Verificar si el producto existe en la base de datos
@@ -62,8 +65,10 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
         producto_pydantic = ProductoPydantic(**producto_accedido.__dict__)
         valorVenta = producto_pydantic.valorVenta * producto.cantidad
         valorTotalPed += valorVenta
+        # Generar un nuevo idDetalle único utilizando el contador
+        id_detalle = next(id_detalle_counter)
         db_productos = DetallePedido_table(
-                                            idDetalle = db_pedido.idPedido,
+                                            idDetalle = id_detalle,
                                             idPedido = db_pedido.idPedido,
                                             idProducto = producto_pydantic.idProducto,
                                             cantidad = producto.cantidad,
