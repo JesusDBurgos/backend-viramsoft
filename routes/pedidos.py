@@ -52,6 +52,7 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
     # Refrescar el objeto para asegurarse de que los cambios se reflejen en el objeto en memoria
     db.refresh(db_pedido)
     valorTotalPed = 0.0
+    lista_productos = []  # Crear una lista para los objetos DetallePedido_table
     for producto in productos:
         # Verificar si el producto existe en la base de datos
         existing_product = conn.execute(select(Producto_table).where(Producto_table.idProducto == producto.idProducto)).fetchone()
