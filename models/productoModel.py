@@ -1,4 +1,5 @@
 from sqlalchemy import Column
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import String, Integer, Float, Date
 from models.base import Base
 
