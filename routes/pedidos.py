@@ -8,7 +8,6 @@ from datetime import datetime
 from typing import List
 
 pedidosR = APIRouter()
-#fecha - 
 
 
 @pedidosR.get("/order",summary="Este endpoint consulta los pedidos", status_code=status.HTTP_200_OK,tags=["Pedido"])
