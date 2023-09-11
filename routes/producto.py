@@ -6,13 +6,13 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select,update
 from typing import List
 import locale
+import asyncio
 
 productosR = APIRouter()
 
 # Endpoint para obtener todos los productos
 
-@productosR.get("/product", status_code=status.HTTP_200_OK,summary="Este endpoint consulta todos los productos", tags=["Productos"])
-def get_products(db: Session = Depends(get_db)):
+async def async_get_products(db: Session):
     """
     Obtiene todos los productos desde la base de datos.
 
@@ -22,13 +22,16 @@ def get_products(db: Session = Depends(get_db)):
     Returns:
         dict: Un diccionario JSON con la lista de productos.
     """
-    # Consultar todos los productos de la base de datos utilizando SQLAlchemy
-    products = db.query(Producto_table).all()
-    # Verificar si hay productos. Si no hay productos, lanzar una excepción 404 (Not Found)
-    if not products:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No se encontraron productos")
-    # Devolver una respuesta JSON con la lista de productos obtenidos
+    # Realiza una consulta asincrónica utilizando la sesión existente
+    products = await asyncio.to_thread(db.query(Producto_table).all)
+    # Procesa los resultados aquí, si es necesario
     return {"productos": products}
+
+@productosR.get("/product", status_code=status.HTTP_200_OK, summary="Este endpoint consulta todos los productos", tags=["Productos"])
+async def get_products(db: Session = Depends(get_db)):
+    # Utiliza asyncio para ejecutar la función asincrónica y obtener los resultados
+    result = await async_get_products(db)
+    return result
 
 # Endpoint para buscar un producto por su Categoria
 
