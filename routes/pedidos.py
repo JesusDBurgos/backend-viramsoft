@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends,status, Response, HTTPException
-from config.database import conn,get_db,database
+from config.database import conn,get_db
 from models.index import Pedido_table,DetallePedido_table, Producto_table
 from schemas.index import PedidoAggPydantic,ProductoPydantic, ProductosPedAggPydantic 
 from sqlalchemy.orm import Session
@@ -30,53 +30,55 @@ def get_orders(db: Session = Depends(get_db)):
     # Devolver una respuesta JSON con la lista de productos obtenidos
     return {"pedidos": orders}
 
-async def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydantic] = None):
-    async with database.transaction():
-        # Insertar el pedido en la tabla de pedidos utilizando SQLAlchemy
-        db_pedido = Pedido_table(
-            documentoCliente=pedido.documentoCliente,
-            observacion=pedido.observacion,
-            fechaEntrega=pedido.fechaEntrega,
-            valorTotal=0,
-            estado="Pendiente",
-        )
-        async with database.transaction():
-            await database.execute(Pedido_table.__table__.insert().values(db_pedido))
-            # Obtén el ID del pedido recién insertado
-            last_record = await database.fetch_one("SELECT LAST_INSERT_ID()")
-            id_pedido = last_record["LAST_INSERT_ID()"]
-
-        valorTotalPed = 0.0
-        id_detalle_counter = count(start=1)
-
-        for producto in productos:
-            # Verificar si el producto existe en la base de datos
-            existing_product = await database.fetch_one(
-                "SELECT * FROM Producto_table WHERE idProducto = :idProducto",
-                values={"idProducto": producto.idProducto},
-            )
-            if not existing_product:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El producto no existe")
-
-            valorVenta = existing_product["valorVenta"] * producto.cantidad
-            valorTotalPed += valorVenta
-
-            id_detalle = next(id_detalle_counter)
-
-            await database.execute(
-                DetallePedido_table.__table__.insert().values(
-                    idDetalle=id_detalle,
-                    idPedido=id_pedido,
-                    idProducto=producto.idProducto,
-                    cantidad=producto.cantidad,
-                    precio=valorVenta,
-                )
-            )
-
-        # Actualizar el valor total del pedido
-        await database.execute(
-            Pedido_table.__table__.update().values(valorTotal=valorTotalPed).where(Pedido_table.idPedido == id_pedido)
-        )
+@pedidosR.post("/create_order",summary="Este endpoint crea un pedido",status_code=status.HTTP_201_CREATED,tags=["Pedido"])
+def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydantic] = None,
+                 db: Session = Depends(get_db)):
+    # Obtener la fecha actual
+    fecha_actual = datetime.now()
+    fecha_pedido = fecha_actual.strftime("%Y-%m-%d")
+    fecha_entrega_str = pedido.fechaEntrega.strftime("%Y-%m-%d")
+    db_pedido = Pedido_table(
+                              documentoCliente = pedido.documentoCliente,
+                              observacion = pedido.observacion,
+                              fechaPedido= fecha_pedido,
+                              fechaEntrega= fecha_entrega_str,
+                              valorTotal = 0,
+                              estado= "Pendiente",
+                            )
+    # Agregar el nuevo producto a la sesión de la base de datos
+    db.add(db_pedido)
+    # Confirmar los cambios en la base de datos
+    db.commit()
+    # Refrescar el objeto para asegurarse de que los cambios se reflejen en el objeto en memoria
+    db.refresh(db_pedido)
+    valorTotalPed = 0.0
+    # Inicializar un contador para generar idDetalle únicos
+    id_detalle_counter = count(start=1)
+    for producto in productos:
+        # Verificar si el producto existe en la base de datos
+        existing_product = db.query(Producto_table).filter(Producto_table.idProducto == producto.idProducto).first()
+        if not existing_product:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El producto no existe")
+        producto_accedido = existing_product 
+        producto_accedido.idProducto = str(producto_accedido.idProducto)
+        producto_pydantic = ProductoPydantic(**producto_accedido.__dict__)
+        valorVenta = producto_pydantic.valorVenta * producto.cantidad
+        valorTotalPed += valorVenta
+        # Generar un nuevo idDetalle único utilizando el contador
+        id_detalle = next(id_detalle_counter)
+        db_productos = DetallePedido_table(
+                                            idDetalle = id_detalle,
+                                            idPedido = db_pedido.idPedido,
+                                            idProducto = producto_accedido.idProducto,
+                                            cantidad = producto.cantidad,
+                                            precio = valorVenta
+                                        )
+        # Agregar el detalle del pedido a la sesión y confirmar cambios
+        db.add(db_productos)
+        db.commit()
+    # Actualiza el valor total del pedido
+    db_pedido.valorTotal = valorTotalPed
+    # Realiza el commit de los cambios en la sesión
+    db.commit()
 
     return Response(status_code=status.HTTP_201_CREATED, content="Pedido creado exitosamente")
-   ## return {"message": "Pedido creado exitosamente"}
