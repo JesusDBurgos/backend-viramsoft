@@ -53,7 +53,7 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
     db.refresh(db_pedido)
     valorTotalPed = 0.0
     # Inicializar un contador para generar idDetalle únicos
-    id_detalle_counter = count(start=0)
+    ##id_detalle_counter = count(start=0)
     for producto in productos:
         # Verificar si el producto existe en la base de datos
         existing_product = db.query(Producto_table).filter(Producto_table.idProducto == producto.idProducto).first()
@@ -65,9 +65,7 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
         valorVenta = producto_pydantic.valorVenta * producto.cantidad
         valorTotalPed += valorVenta
         # Generar un nuevo idDetalle único utilizando el contador
-        id_detalle = next(id_detalle_counter)
         db_productos = DetallePedido_table(
-                                            idDetalle = id_detalle,
                                             idPedido = db_pedido.idPedido,
                                             idProducto = producto_accedido.idProducto,
                                             cantidad = producto.cantidad,
@@ -75,7 +73,6 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
                                         )
         # Agregar el detalle del pedido a la sesión y confirmar cambios
         db.add(db_productos)
-        db.commit()
     # Actualiza el valor total del pedido
     db_pedido.valorTotal = valorTotalPed
     # Realiza el commit de los cambios en la sesión

@@ -14,3 +14,4 @@ class Pedido_table(Base):
     estado = Column(String(255), nullable=False)
     
     detalles = relationship("DetallePedido_table", back_populates="pedido")
+    clientes = relationship("Cliente_table", back_populates="pedido")
