@@ -53,7 +53,7 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
     db.refresh(db_pedido)
     valorTotalPed = 0.0
     # Inicializar un contador para generar idDetalle únicos
-    id_detalle_counter = count(start=1)
+    id_detalle_counter = count(start=0)
     for producto in productos:
         # Verificar si el producto existe en la base de datos
         existing_product = db.query(Producto_table).filter(Producto_table.idProducto == producto.idProducto).first()
