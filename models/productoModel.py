@@ -16,4 +16,5 @@ class Producto_table(Base):
     unidadMedida = Column(String(255),nullable=False)
 
     detalles = relationship("DetallePedido_table", back_populates="producto")
+    imagenes = relationship("imagenes_productos", back_populates='productos')
 

@@ -10,4 +10,4 @@ class ImagenProducto(Base):
     imagen = Column(LargeBinary)
 
     # Relación con el producto
-    producto = relationship('Producto', back_populates='imagenes')
+    productos = relationship('Producto', back_populates='imagenes')
