@@ -17,7 +17,3 @@ class Producto_table(Base):
 
     detalles = relationship("DetallePedido_table", back_populates="producto")
 
-
-
-#Base.metadata.create_all(engine)
-

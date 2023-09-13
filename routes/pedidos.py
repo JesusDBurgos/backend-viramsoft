@@ -73,6 +73,7 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
                                         )
         # Agregar el detalle del pedido a la sesión y confirmar cambios
         db.add(db_productos)
+        #db.commit()
     # Actualiza el valor total del pedido
     db_pedido.valorTotal = valorTotalPed
     # Realiza el commit de los cambios en la sesión
