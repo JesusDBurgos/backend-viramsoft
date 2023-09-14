@@ -2,5 +2,4 @@ from schemas.productoSchema import ProductoPydantic, CantidadPydantic, Productos
 from schemas.clienteSchema import ClientePydantic, ClienteEditarPydantic
 from schemas.detallePedSchema import detallePedPydantic
 from schemas.pedidoSchema import PedidoPydantic,valorPedPydantic,PedidoAggPydantic
-from schemas.imagenesSchema import ImagenProductoSchema
 from schemas.auth import UserLogin 
