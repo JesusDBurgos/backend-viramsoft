@@ -112,26 +112,26 @@ def create_product(producto: ProductoPydantic, db: Session = Depends(get_db)):
     return db_product
 
 @productosR.post("/cargar_imagen", summary="Cargar una imagen y guardarla en la base de datos", tags=["Imagen"])
-async def cargar_imagen(imagen: UploadFile,producto_id = ProductosIdPydantic,db: Session = Depends(get_db)):
+def cargar_imagen(imagen: UploadFile = File(...),producto_id = int,db: Session = Depends(get_db)):
     """
     Carga una imagen y la guarda en la base de datos.
 
     Args:
+        producto_id (int): ID del producto al que se asocia la imagen.
         imagen (UploadFile): Imagen a cargar y guardar en la base de datos.
-
     Returns:
         dict: Un diccionario JSON con un mensaje de éxito.
     """
     # Leer los datos binarios de la imagen
     imagen_data = imagen.file.read()
 
-    # Guardar la imagen en la base de datos (asumiendo que tienes una tabla ImagenProducto)
-    db_image = ImagenProducto(imagen=imagen_data,
-                              producto_id=producto_id.id)
-    db.add(db_image)  # Asegúrate de tener una sesión de base de datos (db) configurada adecuadamente
+    # Guardar la imagen en la base de datos
+    db_image = ImagenProducto(imagen=imagen_data, producto_id=producto_id)
+    db.add(db_image)
     db.commit()
 
     return {"mensaje": "Imagen cargada y guardada correctamente en la base de datos"}
+
 
 # Definir el endpoint para actualizar un producto por su ID
 @productosR.put("/edit_product/{id}",response_model=ProductoPydantic, status_code=status.HTTP_200_OK, tags=["Productos"])

@@ -25,7 +25,7 @@ class ProductosPedAggPydantic(BaseModel):
     cantidad: int
 
 class ProductosIdPydantic(BaseModel):
-    id: int
+    producto_id: int
 
 class ProductosCatPydantic(BaseModel):
     categoria: str
