@@ -2,9 +2,10 @@ from fastapi import APIRouter, Depends, Response, status, HTTPException, UploadF
 from config.database import conn,get_db
 from models.index import Producto_table, ImagenProducto
 from schemas.index import ProductoPydantic,ProductoUpdatePydantic, ProductosCatPydantic, ProductosIdPydantic
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session,joinedload
 from sqlalchemy import select,update
 from typing import List
+import base64
 import locale
 import asyncio
 
@@ -12,26 +13,39 @@ productosR = APIRouter()
 
 # Endpoint para obtener todos los productos
 
-async def async_get_products(db: Session):
+@productosR.get("/product", status_code=status.HTTP_200_OK, summary="Este endpoint consulta todos los productos", tags=["Productos"])
+async def get_products(db: Session = Depends(get_db)):
     """
-    Obtiene todos los productos desde la base de datos.
+    Obtiene todos los productos y sus imágenes correspondientes desde la base de datos.
 
     Args:
         db (Session): Objeto de sesión de la base de datos.
 
     Returns:
-        dict: Un diccionario JSON con la lista de productos.
+        dict: Un diccionario JSON con la lista de productos y sus imágenes.
     """
-    # Realiza una consulta asincrónica utilizando la sesión existente
-    products = await asyncio.to_thread(db.query(Producto_table).all)
-    # Procesa los resultados aquí, si es necesario
-    return {"productos": products}
+    # Consulta todos los productos y sus imágenes correspondientes utilizando una carga conjunta (joinedload)
+    products = db.query(Producto_table).options(joinedload(Producto_table.imagenes)).all()
 
-@productosR.get("/product", status_code=status.HTTP_200_OK, summary="Este endpoint consulta todos los productos", tags=["Productos"])
-async def get_products(db: Session = Depends(get_db)):
-    # Utiliza asyncio para ejecutar la función asincrónica y obtener los resultados
-    result = await async_get_products(db)
-    return result
+    # Procesa los resultados y crea un diccionario con la lista de productos y sus imágenes
+    product_list = []
+    for product in products:
+        product_dict = {
+            "idProducto": product.idProducto,
+            "nombre": product.nombre,
+            "marca": product.marca,
+            "categoria": product.categoria,
+            "cantidad": product.cantidad,
+            "valorCompra": product.valorCompra,
+            "valorVenta": product.valorVenta,
+            "unidadMedida": product.unidadMedida,
+        }
+        if product.imagenes:
+            # Si hay imágenes asociadas al producto, inclúyelas en el diccionario
+            product_dict["imagenes"] = [base64.b64encode(imagen.imagen).decode('utf-8') for imagen in product.imagenes]
+        product_list.append(product_dict)
+
+    return {"productos": product_list}
 
 # Endpoint para buscar un producto por su Categoria
 
