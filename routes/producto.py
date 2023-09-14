@@ -122,12 +122,20 @@ def cargar_imagen(imagen: UploadFile = File(...),producto_id = int,db: Session =
     Returns:
         dict: Un diccionario JSON con un mensaje de éxito.
     """
+    # Consultar si ya existe una imagen para el producto
+    existing_image = db.query(ImagenProducto).filter(ImagenProducto.producto_id == producto_id).first()
+
     # Leer los datos binarios de la imagen
     imagen_data = imagen.file.read()
 
-    # Guardar la imagen en la base de datos
-    db_image = ImagenProducto(imagen=imagen_data, producto_id=producto_id)
-    db.add(db_image)
+    if existing_image:
+        # Si existe una imagen, actualiza sus datos
+        existing_image.imagen = imagen_data
+    else:
+        # Si no existe una imagen, crea una nueva fila en la base de datos
+        db_image = ImagenProducto(imagen=imagen_data, producto_id=producto_id)
+        db.add(db_image)
+
     db.commit()
 
     return {"mensaje": "Imagen cargada y guardada correctamente en la base de datos"}
