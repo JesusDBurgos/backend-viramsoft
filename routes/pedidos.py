@@ -3,7 +3,7 @@ from config.database import conn,get_db
 from models.index import Pedido_table,DetallePedido_table, Producto_table
 from schemas.index import PedidoAggPydantic,ProductoPydantic, ProductosPedAggPydantic 
 from sqlalchemy.orm import Session
-from sqlalchemy import select,update
+from sqlalchemy import select,update, text
 from datetime import datetime
 from itertools import count
 from typing import List
@@ -30,6 +30,31 @@ def get_orders(db: Session = Depends(get_db)):
     # Devolver una respuesta JSON con la lista de productos obtenidos
     return {"pedidos": orders}
 
+@pedidosR.get("/detalle_pedido/{pedido_id}", status_code=status.HTTP_200_OK, summary="Consulta el detalle de un pedido", tags=["Pedido"])
+def get_detalle_pedido(pedido_id: int, db: Session = Depends(get_db)):
+    try:        
+        # Declara la consulta SQL como una expresión de texto
+        consulta_sql = text(f"CALL ConsultarDetallePedido(:pedido_id)")
+        
+        # Llama al procedimiento almacenado utilizando SQLAlchemy
+        result = db.execute(consulta_sql, {"pedido_id": pedido_id}).fetchall()
+        
+        # Procesar los resultados aquí
+        detalle_pedido = [
+        {
+            "idPedido": row[0],
+            "nombre": row[1],
+            "cantidad": row[2],
+            "valor unitario": row[3],
+            "valor total": row[4]
+        }
+        for row in result
+        ]
+        return {"detalle_pedido": detalle_pedido}
+    except Exception as e:
+        raise e
+    
+
 @pedidosR.post("/create_order",summary="Este endpoint crea un pedido",status_code=status.HTTP_201_CREATED,tags=["Pedido"])
 def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydantic] = None,
                  db: Session = Depends(get_db)):
@@ -53,7 +78,6 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
     db.refresh(db_pedido)
     valorTotalPed = 0.0
     # Inicializar un contador para generar idDetalle únicos
-    ##id_detalle_counter = count(start=0)
     for producto in productos:
         # Verificar si el producto existe en la base de datos
         existing_product = db.query(Producto_table).filter(Producto_table.idProducto == producto.idProducto).first()
