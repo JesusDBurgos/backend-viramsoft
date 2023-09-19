@@ -66,19 +66,6 @@ def get_detalle_pedido(pedido_id: int, db: Session = Depends(get_db)):
         if not order:
             raise HTTPException(status_code=404, detail="Pedido no encontrado")
 
-        # datos_pedido = [
-        # {
-        #     "idPedido": rows[0],
-        #     "documentoCliente": rows[1],
-        #     "observacion": rows[2] ,
-        #     "fechaPedido": rows[3],
-        #     "fechaEntrega":rows[4] ,
-        #     "valorTotal": rows[5],
-        #     "estado": rows[6]
-        # }
-        # for rows in order
-        #]
-        # Procesar los resultados aquí
         detalle_pedido = [
         {
             "idPedido": row[0],

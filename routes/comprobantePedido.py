@@ -5,10 +5,10 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 from models.index import DetallePedido_table,Producto_table, Pedido_table, Cliente_table
 from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
+from reportlab.lib.styles import getSampleStyleSheet
 from starlette.responses import StreamingResponse
 from reportlab.lib import colors
-from reportlab.platypus import Table, TableStyle
+from reportlab.platypus import Table, TableStyle, Paragraph, SimpleDocTemplate
 
 comprobantePedido = APIRouter()
 
@@ -50,52 +50,65 @@ async def generar_comprobanteP(pedido_id: int = Query(..., description="ID del p
     # Crear un objeto de lienzo PDF
     response_pdf = BytesIO()
     # Crear un archivo PDF en blanco
-    c = canvas.Canvas(response_pdf, pagesize=letter)
+    doc = SimpleDocTemplate(response_pdf, pagesize=letter)
 
-    # Agregar el encabezado con el logotipo y la información de la empresa
-    c.drawString(100, 750, "Comprobante de Pedido")
-    c.drawString(100, 730, f"Fecha de pedido: {fecha_pedido}")
-    c.drawString(100, 710, f"Fecha de entrega: {fecha_entrega}")
-    c.drawString(100, 690, f"Número de Pedido: {pedido_id}")
-    c.drawString(100, 670, f"Cliente: {nombre_cliente}")
-    c.drawString(100, 650, f"Dirección: {direccion_cliente}")
+    # Lista de elementos para el PDF
+    elements = []
+
+    # Definir estilos
+    styles = getSampleStyleSheet()
+    style_center = styles["Normal"]
+    style_center.alignment = 1  # 0: Izquierda, 1: Centro, 2: Derecha
+    style_bold_center = styles["Normal"]
+    style_bold_center.alignment = 1
+    style_bold_center.fontName = "Helvetica-Bold"
+
+
+    # Encabezado
+    elements.append(Paragraph("Comprobante de Pedido", style_bold_center))
+    elements.append(Paragraph(f"Fecha de pedido: {fecha_pedido}", style_center))
+    elements.append(Paragraph(f"Fecha de entrega: {fecha_entrega}", style_center))
+    elements.append(Paragraph(f"Número de Pedido: {pedido_id}", style_center))
+    elements.append(Paragraph(f"Cliente: {nombre_cliente}", style_center))
+    elements.append(Paragraph(f"Dirección: {direccion_cliente}", style_center))
+    elements.append(Paragraph("", style_center))  # Espacio en blanco
 
     # Crear una tabla para listar los productos
     data = [["Producto", "Cantidad", "Precio Unitario", "Total"]]
     
-    total_pedido = 0  # Inicializar el total del pedido en cero
-
     # Recorrer los detalles del pedido y agregarlos a la tabla
     for detalle_pedido in detalles:
         producto = db.query(Producto_table).filter(Producto_table.idProducto == detalle_pedido.idProducto).first()
         if producto is not None:
             total_producto = detalle_pedido.cantidad * producto.valorVenta
             data.append([producto.nombre, str(detalle_pedido.cantidad), f"${producto.valorVenta:.2f}", f"${total_producto:.2f}"])
-            total_pedido += total_producto
 
-    table = Table(data)
+    # Crear la tabla y aplicar estilos
 
-    # Establecer el estilo de la tabla
-    style = TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+    table = Table(data,colWidths=[200, 70, 100, 100])
+
+    table.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
                         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
                         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
                         ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                        ('GRID', (0, 0), (-1, -1), 1, colors.black)])
+                        ('GRID', (0, 0), (-1, -1), 1, colors.black)]))
 
-    table.setStyle(style)
-
-    # Dibujar la tabla en el PDF
-    table.wrapOn(c, 400, 600)
-    table.drawOn(c, 100, 500)
+    # Agregar la tabla al PDF
+    elements.append(table)
+    # # Dibujar la tabla en el PDF
+    # table.wrapOn(c, 400, 600)
+    # table.drawOn(c, 100, 500)
 
 
     # Agregar el total al pie de la página
-    c.drawString(100, 100, f"Total del Pedido: ${valor_total:.2f}")
+    elements.append(Paragraph(f"Total del Pedido: ${valor_total:.2f}", style_bold_center))      
 
-    # Guardar el PDF
-    c.save()
+
+    # Construir el PDF
+    doc.build(elements) 
+
 
     # Mover el puntero al principio del archivo BytesIO
     response_pdf.seek(0)
