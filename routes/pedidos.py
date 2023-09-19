@@ -58,6 +58,26 @@ def get_detalle_pedido(pedido_id: int, db: Session = Depends(get_db)):
         # Llama al procedimiento almacenado utilizando SQLAlchemy
         result = db.execute(consulta_sql, {"pedido_id": pedido_id}).fetchall()
         
+        if not result:
+            raise HTTPException(status_code=404, detail="Detalle no encontrado")
+        
+        order = db.query(Pedido_table).filter(Pedido_table.idPedido == pedido_id).first()
+
+        if not order:
+            raise HTTPException(status_code=404, detail="Pedido no encontrado")
+
+        # datos_pedido = [
+        # {
+        #     "idPedido": rows[0],
+        #     "documentoCliente": rows[1],
+        #     "observacion": rows[2] ,
+        #     "fechaPedido": rows[3],
+        #     "fechaEntrega":rows[4] ,
+        #     "valorTotal": rows[5],
+        #     "estado": rows[6]
+        # }
+        # for rows in order
+        #]
         # Procesar los resultados aquí
         detalle_pedido = [
         {
@@ -69,7 +89,7 @@ def get_detalle_pedido(pedido_id: int, db: Session = Depends(get_db)):
         }
         for row in result
         ]
-        return {"detalle_pedido": detalle_pedido}
+        return {"detalle_pedido": detalle_pedido,"datos_pedido":order}
     except Exception as e:
         raise e
     
