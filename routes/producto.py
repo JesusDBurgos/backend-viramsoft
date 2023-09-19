@@ -11,7 +11,7 @@ import asyncio
 
 productosR = APIRouter()
 
-# Endpoint para obtener todos los productos
+# Endpoint para obtener TODOS los productos
 
 @productosR.get("/product", status_code=status.HTTP_200_OK, summary="Este endpoint consulta todos los productos", tags=["Productos"])
 async def get_products(db: Session = Depends(get_db)):
@@ -26,6 +26,42 @@ async def get_products(db: Session = Depends(get_db)):
     """
     # Consulta todos los productos y sus imágenes correspondientes utilizando una carga conjunta (joinedload)
     products = db.query(Producto_table).options(joinedload(Producto_table.imagenes)).all()
+
+    # Procesa los resultados y crea un diccionario con la lista de productos y sus imágenes
+    product_list = []
+    for product in products:
+        product_dict = {
+            "idProducto": product.idProducto,
+            "nombre": product.nombre,
+            "marca": product.marca,
+            "categoria": product.categoria,
+            "cantidad": product.cantidad,
+            "valorCompra": product.valorCompra,
+            "valorVenta": product.valorVenta,
+            "unidadMedida": product.unidadMedida,
+        }
+        if product.imagenes:
+            # Si hay imágenes asociadas al producto, inclúyelas en el diccionario
+            product_dict["imagenes"] = [base64.b64encode(imagen.imagen).decode('utf-8') for imagen in product.imagenes]
+        product_list.append(product_dict)
+
+    return {"productos": product_list}
+
+# Endpoint para consultar los productos que tengan stock disponible
+
+@productosR.get("/product_available", status_code=status.HTTP_200_OK, summary="Este endpoint consulta todos los productos disponibles", tags=["Productos"])
+async def get_products_available(db: Session = Depends(get_db)):
+    """
+    Obtiene todos los productos disponibles y sus imágenes correspondientes desde la base de datos.
+
+    Args:
+        db (Session): Objeto de sesión de la base de datos.
+
+    Returns:
+        dict: Un diccionario JSON con la lista de productos y sus imágenes.
+    """
+    # Consulta solo los productos cuya cantidad sea mayor que cero y sus imágenes correspondientes utilizando una carga conjunta (joinedload)
+    products = db.query(Producto_table).filter(Producto_table.cantidad > 0).options(joinedload(Producto_table.imagenes)).all()
 
     # Procesa los resultados y crea un diccionario con la lista de productos y sus imágenes
     product_list = []
