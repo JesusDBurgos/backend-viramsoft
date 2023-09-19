@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends,status, Response, HTTPException
 from config.database import conn,get_db
-from models.index import Pedido_table,DetallePedido_table, Producto_table
+from models.index import Pedido_table,DetallePedido_table, Producto_table, Cliente_table
 from schemas.index import PedidoAggPydantic,ProductoPydantic, ProductosPedAggPydantic 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import select,update, text
 from datetime import datetime
 from itertools import count
@@ -23,12 +23,31 @@ def get_orders(db: Session = Depends(get_db)):
         dict: Un diccionario JSON con la lista de pedidos.
     """
     # Consultar todos los productos de la base de datos utilizando SQLAlchemy
-    orders = db.query(Pedido_table).all()
+    orders = db.query(Pedido_table).join(Cliente_table).options(joinedload(Pedido_table.clientes)).all()
     # Verificar si hay productos. Si no hay productos, lanzar una excepción 404 (Not Found)
     if not orders:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No se encontraron pedidos")
-    # Devolver una respuesta JSON con la lista de productos obtenidos
-    return {"pedidos": orders}
+    
+    # Crear una lista para almacenar los pedidos formateados
+    formatted_orders = []
+    # Recorrer la lista de pedidos y construir el diccionario de respuesta
+    for order in orders:
+        order_dict = {
+            "documentoCliente": order.clientes.documento,  # Obtener el documento del cliente
+            "observacion": order.observacion,
+            "fechaEntrega": str(order.fechaEntrega),
+            "estado": order.estado,
+            "idPedido": order.idPedido,
+            "fechaPedido": str(order.fechaPedido),
+            "valorTotal": order.valorTotal,
+            "telefono": order.clientes.telefono,  # Obtener el teléfono del cliente
+            "nombre": order.clientes.nombre,  # Obtener el nombre del cliente
+            "direccion": order.clientes.direccion  # Obtener la dirección del cliente
+        }
+        formatted_orders.append(order_dict)
+
+    # Devolver una respuesta JSON con la lista de pedidos formateados
+    return {"pedidos": formatted_orders}
 
 @pedidosR.get("/detalle_pedido/{pedido_id}", status_code=status.HTTP_200_OK, summary="Consulta el detalle de un pedido", tags=["Pedido"])
 def get_detalle_pedido(pedido_id: int, db: Session = Depends(get_db)):
