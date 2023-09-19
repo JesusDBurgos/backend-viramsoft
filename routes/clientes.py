@@ -68,7 +68,7 @@ def create_costumer(cliente: ClientePydantic, db: Session = Depends(get_db)):
         dict: Un diccionario JSON con los datos del nuevo cliente creado.
     """
     # Buscar un cliente inactivo con el mismo número de documento
-    cliente_existente = db.query(Cliente_table).filter(Cliente_table.documento == cliente.documento, Cliente_table.estado == "INACTIVO").first()
+    cliente_existente = db.query(Cliente_table).filter(Cliente_table.documento == cliente.documento).first()
     if cliente_existente:
         if cliente_existente.estado == "INACTIVO":
             # Si se encuentra un cliente inactivo con el mismo número de documento,
