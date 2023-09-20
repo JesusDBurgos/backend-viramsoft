@@ -8,13 +8,12 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
 from starlette.responses import StreamingResponse
 from reportlab.lib import colors
-from reportlab.platypus import Table, TableStyle, Paragraph, SimpleDocTemplate
+from reportlab.platypus import Table, TableStyle, Paragraph, SimpleDocTemplate, Spacer
+from reportlab.platypus.flowables import KeepTogether
 
 comprobantePedido = APIRouter()
 
-def consultar_producto_por_id(id_producto,db: Session = get_db):
-    query = select(Producto_table).where(Producto_table.idProducto == id_producto)
-    return db.execute(query).first()
+
 
     
 @comprobantePedido.get("/generar_comprobante")
@@ -44,6 +43,7 @@ async def generar_comprobanteP(pedido_id: int = Query(..., description="ID del p
     if cliente:
         nombre_cliente = cliente.nombre
         direccion_cliente = cliente.direccion
+        telefono_cliente = cliente.telefono
     else:
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
     
@@ -55,23 +55,42 @@ async def generar_comprobanteP(pedido_id: int = Query(..., description="ID del p
     # Lista de elementos para el PDF
     elements = []
 
-    # Definir estilos
+    # Obtener los estilos de muestra
     styles = getSampleStyleSheet()
-    style_center = styles["Normal"]
-    style_center.alignment = 1  # 0: Izquierda, 1: Centro, 2: Derecha
-    style_bold_center = styles["Normal"]
-    style_bold_center.alignment = 1
-    style_bold_center.fontName = "Helvetica-Bold"
+    # Defino el estilo del titulo
+    style_title = styles["Normal"]
+    style_title.alignment = 1 # 0: Izquierda, 1: Centro, 2: Derecha
+    style_title.fontName = "Helvetica-Bold"
+    style_title.spaceAfter = 20
+    style_title.fontSize = 16
+    # Defino el estilo de los items del encabezado
+    style_left = styles["Normal"].clone("style_left")
+    style_left.alignment = 0
+    style_left.fontName = "Helvetica"
+    style_left.fontSize = 11
+    style_left.spaceAfter = 15
+    style_left_encabezado = styles["Normal"].clone("style_left_encabezado")
+    style_left_encabezado.alignment = 0
+    style_left_encabezado.fontName = "Helvetica-Bold"
+    style_left_encabezado.fontSize = 14
+    style_left_encabezado.spaceBefore = 15
+    # Defino estilo del valor total del pedido
+    style_bold_total = styles["Normal"].clone("style_bold_total")
+    style_bold_total.alignment = 2
+    style_bold_total.fontName = "Helvetica-Bold"
+    style_bold_total.fontSize = 14
+    style_bold_total.spaceBefore = 25
 
+    fecha_juntas = Paragraph(f"<b>Número de Pedido:</b> {pedido_id} &nbsp;&nbsp;&nbsp; <b>Fecha de pedido:</b> {fecha_pedido} &nbsp;&nbsp;&nbsp;&nbsp; <b>Fecha de entrega:</b>{fecha_entrega}", style_left)
+    cliente = Paragraph(f"<b>Cliente:</b> {nombre_cliente} &nbsp;&nbsp;&nbsp; <b>Dirección:</b> {direccion_cliente} &nbsp;&nbsp;&nbsp; <b>Teléfono:</b> {telefono_cliente}", style_left)
+    
 
     # Encabezado
-    elements.append(Paragraph("Comprobante de Pedido", style_bold_center))
-    elements.append(Paragraph(f"Fecha de pedido: {fecha_pedido}", style_center))
-    elements.append(Paragraph(f"Fecha de entrega: {fecha_entrega}", style_center))
-    elements.append(Paragraph(f"Número de Pedido: {pedido_id}", style_center))
-    elements.append(Paragraph(f"Cliente: {nombre_cliente}", style_center))
-    elements.append(Paragraph(f"Dirección: {direccion_cliente}", style_center))
-    elements.append(Paragraph("", style_center))  # Espacio en blanco
+    elements.append(Paragraph("Viramsoft", style_title))
+    elements.append(Paragraph(f"Comprobante de Pedido" , style_left_encabezado))
+    elements.append(fecha_juntas)
+    elements.append(cliente)
+    #elements.append(Paragraph("", style_center))  # Espacio en blanco
 
     # Crear una tabla para listar los productos
     data = [["Producto", "Cantidad", "Precio Unitario", "Total"]]
@@ -87,12 +106,12 @@ async def generar_comprobanteP(pedido_id: int = Query(..., description="ID del p
 
     table = Table(data,colWidths=[200, 70, 100, 100])
 
-    table.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+    table.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
+                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
                         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                        ('BACKGROUND', (0, 1), (-1, -1), colors.whitesmoke),
                         ('GRID', (0, 0), (-1, -1), 1, colors.black)]))
 
     # Agregar la tabla al PDF
@@ -103,7 +122,7 @@ async def generar_comprobanteP(pedido_id: int = Query(..., description="ID del p
 
 
     # Agregar el total al pie de la página
-    elements.append(Paragraph(f"Total del Pedido: ${valor_total:.2f}", style_bold_center))      
+    elements.append(Paragraph(f"Total del Pedido: ${valor_total:.2f}", style_bold_total))      
 
 
     # Construir el PDF
