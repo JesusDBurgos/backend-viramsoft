@@ -71,8 +71,8 @@ def get_detalle_pedido(pedido_id: int, db: Session = Depends(get_db)):
             "idPedido": row[0],
             "nombre": row[1],
             "cantidad": row[2],
-            "valor unitario": row[3],
-            "valor total": row[4]
+            "valor unitario": row[3] / row[2],
+            "valor total": row[3]
         }
         for row in result
         ]
