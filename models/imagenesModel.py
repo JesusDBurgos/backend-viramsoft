@@ -7,7 +7,7 @@ class ImagenProducto(Base):
 
     id = Column(Integer, primary_key=True)
     producto_id = Column(Integer, ForeignKey('producto.idProducto'), nullable=False)
-    imagen = Column(LargeBinary)
+    imagen = Column(LargeBinary(length=(2**32)-1))
 
     # Relación con el producto
     productos = relationship('Producto_table', back_populates='imagenes')
