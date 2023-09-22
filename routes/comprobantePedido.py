@@ -99,8 +99,7 @@ async def generar_comprobanteP(pedido_id: int = Query(..., description="ID del p
     for detalle_pedido in detalles:
         producto = db.query(Producto_table).filter(Producto_table.idProducto == detalle_pedido.idProducto).first()
         if producto is not None:
-            total_producto = detalle_pedido.cantidad * producto.valorVenta
-            data.append([producto.nombre, str(detalle_pedido.cantidad), f"${producto.valorVenta:.2f}", f"${total_producto:.2f}"])
+            data.append([producto.nombre, str(detalle_pedido.cantidad), f"${detalle_pedido.precio/detalle_pedido.cantidad:.2f}", f"${detalle_pedido.precio:.2f}"])
 
     # Crear la tabla y aplicar estilos
 
