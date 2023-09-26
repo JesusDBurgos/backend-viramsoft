@@ -138,7 +138,7 @@ def search_product_by_id(id:int):
 # Endpoint para crear un nuevo producto
 
 @productosR.post("/create_product", summary="Este endpoint crea un producto",status_code=status.HTTP_201_CREATED,tags=["Productos"])
-def create_product(imagen: UploadFile = File(...),producto_data: dict = None,  db: Session = Depends(get_db)):
+def create_product(producto: ProductoPydantic, db: Session = Depends(get_db)):
     """
     Crea un nuevo producto en la base de datos.
 
@@ -151,7 +151,9 @@ def create_product(imagen: UploadFile = File(...),producto_data: dict = None,  d
     # Establece el encabezado Content-Type como application/json
     try:
         # Crear un nuevo objeto Producto_table utilizando los datos proporcionados en el cuerpo de la solicitud
-        db_product = Producto_table(**producto_data)
+        db_product = Producto_table(nombre = producto.nombre,marca = producto.marca,categoria= producto.categoria, cantidad = producto.cantidad, 
+                          valorCompra= producto.valorCompra, valorVenta= producto.valorVenta,
+                          unidadMedida= producto.unidadMedida)
         # Agregar el nuevo producto a la sesión de la base de datos
         db.add(db_product)
         # Confirmar los cambios en la base de datos
@@ -159,9 +161,9 @@ def create_product(imagen: UploadFile = File(...),producto_data: dict = None,  d
         # Refrescar el objeto para asegurarse de que los cambios se reflejen en el objeto en memoria
         db.refresh(db_product)
         # Guardar la imagen en la base de datos
-        if imagen is not None:
+        if producto.imagen is not None:
             # Leer los datos binarios de la imagen
-            imagen_data = imagen.file.read()
+            imagen_data = producto.imagen.file.read()
 
             # Guardar la imagen en la base de datos
             db_image = ImagenProducto(imagen=imagen_data, producto_id=db_product.idProducto)
