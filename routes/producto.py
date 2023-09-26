@@ -137,8 +137,8 @@ def search_product_by_id(id:int):
 
 # Endpoint para crear un nuevo producto
 
-@productosR.post("/create_product",response_model=ProductoPydantic, summary="Este endpoint crea un producto",status_code=status.HTTP_201_CREATED,tags=["Productos"])
-def create_product(producto_data: dict ,imagen: UploadFile = File(...),  db: Session = Depends(get_db)):
+@productosR.post("/create_product", summary="Este endpoint crea un producto",status_code=status.HTTP_201_CREATED,tags=["Productos"])
+def create_product(imagen: UploadFile = File(...),producto_data: dict = None,  db: Session = Depends(get_db)):
     """
     Crea un nuevo producto en la base de datos.
 
