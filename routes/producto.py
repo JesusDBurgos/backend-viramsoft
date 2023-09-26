@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, Response, status, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, Response, status, HTTPException, UploadFile, File, Body
+from fastapi.responses import JSONResponse
 from config.database import conn,get_db
 from models.index import Producto_table, ImagenProducto
-from schemas.index import ProductoPydantic,ProductoUpdatePydantic, ProductosCatPydantic, ProductosIdPydantic
+from schemas.index import ProductoPydantic,ProductoUpdatePydantic, ImagenPydantic
 from sqlalchemy.orm import Session,joinedload
 from sqlalchemy import select,update
 from typing import List
@@ -136,18 +137,20 @@ def search_product_by_id(id:int):
 
 # Endpoint para crear un nuevo producto
 
-@productosR.post("/create_product",summary="Este endpoint crea un producto",status_code=status.HTTP_201_CREATED,tags=["Productos"])
-def create_product(producto: ProductoPydantic, db: Session = Depends(get_db)):
+@productosR.post("/create_product", summary="Este endpoint crea un producto",status_code=status.HTTP_201_CREATED,tags=["Productos"])
+def create_product(producto: ProductoPydantic ,imagen: ImagenPydantic = Body(...),  db: Session = Depends(get_db)):
     """
     Crea un nuevo producto en la base de datos.
 
     Args:
         producto (ProductoPydantic): Datos del producto a crear.
-        db (Session): Objeto de sesión de la base de datos.
-
+        imagen (UploadFile): Imagen a cargar y guardar en la base de datos.
     Returns:
         dict: Un diccionario JSON con los datos del nuevo producto creado.
     """
+    # Establece el encabezado Content-Type como application/json
+    response = JSONResponse(content={"mensaje": "usted es un duro primo hermano"})
+    #response.headers["Content-Type"] = "application/json"
     # Crear un nuevo objeto Producto_table utilizando los datos proporcionados en el cuerpo de la solicitud
     db_product = Producto_table(nombre = producto.nombre,marca = producto.marca,categoria= producto.categoria, cantidad = producto.cantidad, 
                           valorCompra= producto.valorCompra, valorVenta= producto.valorVenta,
@@ -158,8 +161,17 @@ def create_product(producto: ProductoPydantic, db: Session = Depends(get_db)):
     db.commit()
     # Refrescar el objeto para asegurarse de que los cambios se reflejen en el objeto en memoria
     db.refresh(db_product)
-    # Devolver el nuevo producto creado en formato JSON
-    return db_product
+    # Guardar la imagen en la base de datos
+    if imagen is not None:
+        # Leer los datos binarios de la imagen
+        imagen_data = imagen.file.read()
+
+        # Guardar la imagen en la base de datos
+        db_image = ImagenProducto(imagen=imagen_data, producto_id=db_product.id)
+        db.add(db_image)
+        db.commit()
+
+    return response
 
 @productosR.post("/cargar_imagen", summary="Cargar una imagen y guardarla en la base de datos", tags=["Imagen"])
 def cargar_imagen(imagen: UploadFile = File(...),producto_id = int,db: Session = Depends(get_db)):
