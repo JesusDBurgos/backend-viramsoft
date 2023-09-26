@@ -137,8 +137,8 @@ def search_product_by_id(id:int):
 
 # Endpoint para crear un nuevo producto
 
-@productosR.post("/create_product", summary="Este endpoint crea un producto",status_code=status.HTTP_201_CREATED,tags=["Productos"])
-def create_product(producto: ProductoPydantic ,imagen: UploadFile = File(...),  db: Session = Depends(get_db)):
+@productosR.post("/create_product",response_model=ProductoPydantic, summary="Este endpoint crea un producto",status_code=status.HTTP_201_CREATED,tags=["Productos"])
+def create_product(producto_data: dict ,imagen: UploadFile = File(...),  db: Session = Depends(get_db)):
     """
     Crea un nuevo producto en la base de datos.
 
@@ -151,9 +151,7 @@ def create_product(producto: ProductoPydantic ,imagen: UploadFile = File(...),  
     # Establece el encabezado Content-Type como application/json
     try:
         # Crear un nuevo objeto Producto_table utilizando los datos proporcionados en el cuerpo de la solicitud
-        db_product = Producto_table(nombre = producto.nombre,marca = producto.marca,categoria= producto.categoria, cantidad = producto.cantidad, 
-                            valorCompra= producto.valorCompra, valorVenta= producto.valorVenta,
-                            unidadMedida= producto.unidadMedida)
+        db_product = Producto_table(**producto_data)
         # Agregar el nuevo producto a la sesión de la base de datos
         db.add(db_product)
         # Confirmar los cambios en la base de datos
