@@ -149,8 +149,6 @@ def create_product(producto: ProductoPydantic ,imagen: UploadFile = File(...),  
         dict: Un diccionario JSON con los datos del nuevo producto creado.
     """
     # Establece el encabezado Content-Type como application/json
-    response = JSONResponse(content={"mensaje": "usted es un duro primo hermano"})
-    response.headers["Content-Type"] = "application/json"
     try:
         # Crear un nuevo objeto Producto_table utilizando los datos proporcionados en el cuerpo de la solicitud
         db_product = Producto_table(nombre = producto.nombre,marca = producto.marca,categoria= producto.categoria, cantidad = producto.cantidad, 
@@ -168,11 +166,11 @@ def create_product(producto: ProductoPydantic ,imagen: UploadFile = File(...),  
             imagen_data = imagen.file.read()
 
             # Guardar la imagen en la base de datos
-            db_image = ImagenProducto(imagen=imagen_data, producto_id=db_product.id)
+            db_image = ImagenProducto(imagen=imagen_data, producto_id=db_product.idProducto)
             db.add(db_image)
             db.commit()
 
-        return response
+        return {"mensaje": "usted es un duro primo hermano"}
     except HTTPException as e:
         # Captura y maneja el error de validación
         return {"error": e.detail}
