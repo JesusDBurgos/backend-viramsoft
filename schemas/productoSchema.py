@@ -4,7 +4,6 @@ from typing import Optional
 from pydantic import BaseModel
 
 class ProductoPydantic(BaseModel):
-    idProducto: Optional[int] = "1"
     nombre: str = "Varsol"
     marca: str = "P&G"
     categoria: str = "Líquidos"

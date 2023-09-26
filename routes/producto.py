@@ -151,27 +151,31 @@ def create_product(producto: ProductoPydantic ,imagen: UploadFile = File(...),  
     # Establece el encabezado Content-Type como application/json
     response = JSONResponse(content={"mensaje": "usted es un duro primo hermano"})
     #response.headers["Content-Type"] = "application/json"
-    # Crear un nuevo objeto Producto_table utilizando los datos proporcionados en el cuerpo de la solicitud
-    db_product = Producto_table(nombre = producto.nombre,marca = producto.marca,categoria= producto.categoria, cantidad = producto.cantidad, 
-                          valorCompra= producto.valorCompra, valorVenta= producto.valorVenta,
-                          unidadMedida= producto.unidadMedida)
-    # Agregar el nuevo producto a la sesión de la base de datos
-    db.add(db_product)
-    # Confirmar los cambios en la base de datos
-    db.commit()
-    # Refrescar el objeto para asegurarse de que los cambios se reflejen en el objeto en memoria
-    db.refresh(db_product)
-    # Guardar la imagen en la base de datos
-    if imagen is not None:
-        # Leer los datos binarios de la imagen
-        imagen_data = imagen.file.read()
-
-        # Guardar la imagen en la base de datos
-        db_image = ImagenProducto(imagen=imagen_data, producto_id=db_product.id)
-        db.add(db_image)
+    try:
+        # Crear un nuevo objeto Producto_table utilizando los datos proporcionados en el cuerpo de la solicitud
+        db_product = Producto_table(nombre = producto.nombre,marca = producto.marca,categoria= producto.categoria, cantidad = producto.cantidad, 
+                            valorCompra= producto.valorCompra, valorVenta= producto.valorVenta,
+                            unidadMedida= producto.unidadMedida)
+        # Agregar el nuevo producto a la sesión de la base de datos
+        db.add(db_product)
+        # Confirmar los cambios en la base de datos
         db.commit()
+        # Refrescar el objeto para asegurarse de que los cambios se reflejen en el objeto en memoria
+        db.refresh(db_product)
+        # Guardar la imagen en la base de datos
+        if imagen is not None:
+            # Leer los datos binarios de la imagen
+            imagen_data = imagen.file.read()
 
-    return response
+            # Guardar la imagen en la base de datos
+            db_image = ImagenProducto(imagen=imagen_data, producto_id=db_product.id)
+            db.add(db_image)
+            db.commit()
+
+        return response
+    except HTTPException as e:
+        # Captura y maneja el error de validación
+        return {"error": e.detail}
 
 @productosR.post("/cargar_imagen", summary="Cargar una imagen y guardarla en la base de datos", tags=["Imagen"])
 def cargar_imagen(imagen: UploadFile = File(...),producto_id = int,db: Session = Depends(get_db)):
