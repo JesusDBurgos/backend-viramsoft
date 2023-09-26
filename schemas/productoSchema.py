@@ -13,8 +13,6 @@ class ProductoPydantic(BaseModel):
     valorVenta: int = "6500"
     unidadMedida: str = "500ML"
 
-class ImagenPydantic(BaseModel):
-    imagen: UploadFile = File(...)
 
 class ProductoUpdatePydantic(BaseModel):
     cantidad: int = "15"

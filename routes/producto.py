@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Response, status, HTTPException, UploadF
 from fastapi.responses import JSONResponse
 from config.database import conn,get_db
 from models.index import Producto_table, ImagenProducto
-from schemas.index import ProductoPydantic,ProductoUpdatePydantic, ImagenPydantic
+from schemas.index import ProductoPydantic,ProductoUpdatePydantic
 from sqlalchemy.orm import Session,joinedload
 from sqlalchemy import select,update
 from typing import List
@@ -138,7 +138,7 @@ def search_product_by_id(id:int):
 # Endpoint para crear un nuevo producto
 
 @productosR.post("/create_product", summary="Este endpoint crea un producto",status_code=status.HTTP_201_CREATED,tags=["Productos"])
-def create_product(producto: ProductoPydantic ,imagen: ImagenPydantic = Body(...),  db: Session = Depends(get_db)):
+def create_product(producto: ProductoPydantic ,imagen: UploadFile = File(...),  db: Session = Depends(get_db)):
     """
     Crea un nuevo producto en la base de datos.
 
