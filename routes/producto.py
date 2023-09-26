@@ -150,7 +150,7 @@ def create_product(producto: ProductoPydantic ,imagen: UploadFile = File(...),  
     """
     # Establece el encabezado Content-Type como application/json
     response = JSONResponse(content={"mensaje": "usted es un duro primo hermano"})
-    #response.headers["Content-Type"] = "application/json"
+    response.headers["Content-Type"] = "application/json"
     try:
         # Crear un nuevo objeto Producto_table utilizando los datos proporcionados en el cuerpo de la solicitud
         db_product = Producto_table(nombre = producto.nombre,marca = producto.marca,categoria= producto.categoria, cantidad = producto.cantidad, 
