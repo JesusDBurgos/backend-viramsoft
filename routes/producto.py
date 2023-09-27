@@ -42,7 +42,8 @@ async def get_products(db: Session = Depends(get_db)):
     """
     # Consulta todos los productos y sus imágenes correspondientes utilizando una carga conjunta (joinedload)
     products = (
-        db.query(Producto_table).options(joinedload(Producto_table.imagenes)).all()
+        db.query(Producto_table).options(
+            joinedload(Producto_table.imagenes)).all()
     )
 
     # Procesa los resultados y crea un diccionario con la lista de productos y sus imágenes
@@ -239,7 +240,7 @@ def create_product(producto: ProductoPydantic, db: Session = Depends(get_db)):
             db.add(db_image)
             db.commit()
 
-        return {"mensaje": "Producto creado exitosamente", "producto": db_product}
+        return {"mensaje": "Producto creado exitosamente"}
     except HTTPException as e:
         # Captura y maneja el error de validación
         return {"error": e.detail}
@@ -318,19 +319,22 @@ def update_data(
 
         # Consultar si ya existe una imagen para el producto
         existing_image = (
-            db.query(ImagenProducto).filter(ImagenProducto.producto_id == id).first()
+            db.query(ImagenProducto).filter(
+                ImagenProducto.producto_id == id).first()
         )
 
         # Decodificar la imagen de base64 a datos binarios
-        imagen_data = base64.b64decode(producto.imagen)
+        
 
-        if existing_image:
-            # Si existe una imagen, actualiza sus datos
-            existing_image.imagen = imagen_data
-        else:
-            # Si no existe una imagen, crea una nueva fila en la base de datos
-            db_image = ImagenProducto(imagen=imagen_data, producto_id=id)
-            db.add(db_image)
+        if producto.imagen != "":
+            imagen_data = base64.b64decode(producto.imagen)
+            if existing_image:
+                # Si existe una imagen, actualiza sus datos
+                existing_image.imagen = imagen_data
+            else:
+                # Si no existe una imagen, crea una nueva fila en la base de datos
+                db_image = ImagenProducto(imagen=imagen_data, producto_id=id)
+                db.add(db_image)
         # Ejecutar la consulta para actualizar el producto en la base de datos
         db.execute(query)
 
@@ -339,7 +343,8 @@ def update_data(
 
         # Crear una consulta para obtener el producto actualizado
         updated_product = (
-            db.query(Producto_table).filter(Producto_table.idProducto == id).first()
+            db.query(Producto_table).filter(
+                Producto_table.idProducto == id).first()
         )
 
         # Devolver el producto actualizado en el formato esperado (ProductoPydantic)

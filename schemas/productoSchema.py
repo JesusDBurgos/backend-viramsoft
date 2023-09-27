@@ -18,7 +18,7 @@ class ProductoUpdatePydantic(BaseModel):
     cantidad: int = "15"
     valorCompra: int = "4200"
     valorVenta: int = "6500"
-    imagen: str = None
+    imagen: str = ""
     
 class CantidadPydantic(BaseModel):
     cantidad: int
