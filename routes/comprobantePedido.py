@@ -90,7 +90,6 @@ async def generar_comprobanteP(pedido_id: int = Query(..., description="ID del p
     elements.append(Paragraph(f"Comprobante de Pedido" , style_left_encabezado))
     elements.append(fecha_juntas)
     elements.append(cliente)
-    #elements.append(Paragraph("", style_center))  # Espacio en blanco
 
     # Crear una tabla para listar los productos
     data = [["Producto", "Cantidad", "Precio Unitario", "Total"]]
@@ -115,10 +114,6 @@ async def generar_comprobanteP(pedido_id: int = Query(..., description="ID del p
 
     # Agregar la tabla al PDF
     elements.append(table)
-    # # Dibujar la tabla en el PDF
-    # table.wrapOn(c, 400, 600)
-    # table.drawOn(c, 100, 500)
-
 
     # Agregar el total al pie de la página
     elements.append(Paragraph(f"Total del Pedido: ${valor_total:.2f}", style_bold_total))      
@@ -136,5 +131,7 @@ async def generar_comprobanteP(pedido_id: int = Query(..., description="ID del p
     
     # Establecer el encabezado Content-Disposition para controlar el nombre del archivo PDF que se descargará
     response.headers["Content-Disposition"] = f"attachment; filename=comprobante_pedido_{pedido_id}.pdf"
+    # Forzar la descarga del archivo PDF
+    response.force_download = True
 
     return response
