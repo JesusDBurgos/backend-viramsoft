@@ -169,7 +169,8 @@ def create_product(producto: ProductoPydantic, db: Session = Depends(get_db)):
             db.add(db_image)
             db.commit()
 
-        return {"mensaje": "Producto creado exitosamente"}
+        return {"mensaje": "Producto creado exitosamente",
+                "producto": db_product}
     except HTTPException as e:
         # Captura y maneja el error de validación
         return {"error": e.detail}
