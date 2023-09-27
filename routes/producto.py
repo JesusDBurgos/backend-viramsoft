@@ -162,13 +162,14 @@ def create_product(producto: ProductoPydantic, db: Session = Depends(get_db)):
         db.refresh(db_product)
         # Guardar la imagen en la base de datos
         if producto.imagen is not None:
-            imagen_data = producto.imagen.encode()  # Convertir el texto a bytes
+            # Decodificar la imagen de base64 a datos binarios
+            imagen_data = base64.b64decode(producto.imagen)
             # Guardar la imagen en la base de datos
             db_image = ImagenProducto(imagen=imagen_data, producto_id=db_product.idProducto)
             db.add(db_image)
             db.commit()
 
-        return {"mensaje": "usted es un duro primo hermano"}
+        return {"mensaje": "Producto creado exitosamente"}
     except HTTPException as e:
         # Captura y maneja el error de validación
         return {"error": e.detail}
