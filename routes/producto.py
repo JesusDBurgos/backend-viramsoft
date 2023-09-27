@@ -162,9 +162,7 @@ def create_product(producto: ProductoPydantic, db: Session = Depends(get_db)):
         db.refresh(db_product)
         # Guardar la imagen en la base de datos
         if producto.imagen is not None:
-            # Leer los datos binarios de la imagen
-            imagen_data = producto.imagen.file.read()
-
+            imagen_data = producto.imagen.encode()  # Convertir el texto a bytes
             # Guardar la imagen en la base de datos
             db_image = ImagenProducto(imagen=imagen_data, producto_id=db_product.idProducto)
             db.add(db_image)
