@@ -15,6 +15,7 @@ from starlette.responses import StreamingResponse
 from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle, Paragraph, SimpleDocTemplate, Spacer
 from reportlab.platypus.flowables import KeepTogether
+import base64
 
 comprobantePedido = APIRouter()
 
@@ -160,14 +161,11 @@ async def generar_comprobanteP(
     # Mover el puntero al principio del archivo BytesIO
     response_pdf.seek(0)
 
-    # Crear una respuesta de transmisión con el búfer PDF y el tipo de medios "application/pdf"
-    response = StreamingResponse(
-        BytesIO(response_pdf.read()), media_type="application/pdf"
-    )
+    # Leer los datos del PDF como bytes
+    pdf_bytes = response_pdf.read()
 
-    # Establecer el encabezado Content-Disposition para controlar el nombre del archivo PDF que se descargará
-    response.headers[
-        "Content-Disposition"
-    ] = f"attachment; filename=comprobante_pedido_{pedido_id}.pdf"
+    # Codificar los bytes del PDF en base64
+    pdf_base64 = base64.b64encode(pdf_bytes).decode("utf-8")
 
-    return response
+    # Crear una respuesta JSON que contenga el PDF en base64
+    return {"pdf_base64": pdf_base64}
