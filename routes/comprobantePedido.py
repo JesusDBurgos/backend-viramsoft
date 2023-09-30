@@ -168,4 +168,4 @@ async def generar_comprobanteP(
     pdf_base64 = base64.b64encode(pdf_bytes).decode("utf-8")
 
     # Crear una respuesta JSON que contenga el PDF en base64
-    return {"pdf_base64": pdf_base64}
+    return {pdf_base64}
