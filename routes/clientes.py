@@ -19,7 +19,43 @@ def get_costumers(db: Session = Depends(get_db)):
         dict: Un diccionario JSON con la lista de clientes.
     """
     # Consultar todos los clientes de la base de datos utilizando SQLAlchemy
+    clientes = db.query(Cliente_table).select_from(Cliente_table)
+    # Convertir los resultados en una lista de diccionarios
+    clientes_list = [cliente.__dict__ for cliente in clientes]
+    # Devolver una respuesta JSON con la lista de clientes obtenidos
+    return {"clientes":clientes_list}
+
+@clientesR.get("/costumer_active", status_code=status.HTTP_200_OK,summary="Este endpoint consulta los clientes con estado ACTIVO", tags=["Clientes"])
+def get_costumers_active(db: Session = Depends(get_db)):
+    """
+    Obtiene los clientes con estado ACTIVO desde la base de datos.
+
+    Args:
+        db (Session): Objeto de sesión de la base de datos.
+
+    Returns:
+        dict: Un diccionario JSON con la lista de clientes.
+    """
+    # Consultar los clientes de la base de datos utilizando SQLAlchemy
     clientes = db.query(Cliente_table).select_from(Cliente_table).where(Cliente_table.estado == "ACTIVO")
+    # Convertir los resultados en una lista de diccionarios
+    clientes_list = [cliente.__dict__ for cliente in clientes]
+    # Devolver una respuesta JSON con la lista de clientes obtenidos
+    return {"clientes":clientes_list}
+
+@clientesR.get("/costumer_inactive", status_code=status.HTTP_200_OK,summary="Este endpoint consulta los clientes con estado INACTIVO", tags=["Clientes"])
+def get_costumers_inactive(db: Session = Depends(get_db)):
+    """
+    Obtiene los clientes con estado INACTIVO desde la base de datos.
+
+    Args:
+        db (Session): Objeto de sesión de la base de datos.
+
+    Returns:
+        dict: Un diccionario JSON con la lista de clientes.
+    """
+    # Consultar los clientes de la base de datos utilizando SQLAlchemy
+    clientes = db.query(Cliente_table).select_from(Cliente_table).where(Cliente_table.estado == "INACTIVO")
     # Convertir los resultados en una lista de diccionarios
     clientes_list = [cliente.__dict__ for cliente in clientes]
     # Devolver una respuesta JSON con la lista de clientes obtenidos
@@ -53,7 +89,7 @@ def search_costumer(id:str,db: Session = Depends(get_db)):
     # Devolver el producto encontrado en formato JSON utilizando el modelo ClientePydantic
     return ClientePydantic(**cliente_dict)
 
-# Endpoint para crear un nuevo producto
+# Endpoint para crear un nuevo cliente
 
 @clientesR.post("/create_costumer",summary="Este endpoint crea un cliente",response_model=ClientePydantic,status_code=status.HTTP_201_CREATED,tags=["Clientes"])
 def create_costumer(cliente: ClientePydantic, db: Session = Depends(get_db)):
@@ -103,7 +139,7 @@ def create_costumer(cliente: ClientePydantic, db: Session = Depends(get_db)):
 
 # Endpoint para modificar un cliente
 
-@clientesR.put("/edit_costumer/{id}",response_model=ClienteEditarPydantic, status_code=status.HTTP_200_OK, tags=["Clientes"])
+@clientesR.put("/edit_costumer/{id}",summary="Este endpoint edita el cliente seleccionado por su id",response_model=ClienteEditarPydantic, status_code=status.HTTP_200_OK, tags=["Clientes"])
 def update_data(id: str, cliente: ClienteEditarPydantic):
     """
     Modifica un cliente de la base de datos.
@@ -133,20 +169,21 @@ def update_data(id: str, cliente: ClienteEditarPydantic):
     # Devolver el cliente actualizado en el formato esperado (ClientePydantic)
     return ClientePydantic(**response)
 
-@clientesR.delete("/delete_costumer_by_id/{id_cliente}", status_code=204)
-def delete_cliente(doc_cliente: int, db: Session = Depends(get_db)):
+@clientesR.put("/costumer_change_state/{id_cliente}", status_code=200, tags=["Clientes"])
+def costumer_change_state(doc_cliente: int,summary="Este endpoint cambia el estado del cliente", db: Session = Depends(get_db)):
     # Obtener el cliente por su idCliente
     cliente = db.query(Cliente_table).filter(Cliente_table.documento == doc_cliente).first()
 
     # Verificar si el cliente existe
     if not cliente:
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
-
-    # Eliminar el cliente estableciendo su estado como "INACTIVO"
-    cliente.estado = "INACTIVO"
-
+    elif cliente.estado == "INACTIVO":
+        cliente.estado = "ACTIVO"
+    elif cliente.estado == "ACTIVO":
+        cliente.estado = "INACTIVO"    
+    estado = cliente.estado
     # Confirmar los cambios en la base de datos
     db.commit()
 
     # Devolver una respuesta exitosa
-    return None
+    return {"mensaje":f"El estado del cliente ahora es {estado}"}
