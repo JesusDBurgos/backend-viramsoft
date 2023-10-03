@@ -130,3 +130,52 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
     db.commit()
 
     return Response(status_code=status.HTTP_201_CREATED, content="Pedido creado exitosamente")
+
+@pedidosR.put(
+    "/edit_product_state_delivered/{id}",
+    status_code= status.HTTP_200_OK ,
+    tags=["Pedido"]
+)
+def update_state_delivered(
+    id:int,db: Session = Depends(get_db)
+):
+    if not isinstance(id, int) or id <= 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="El ID del pedido debe ser un número entero positivo"
+        )
+    # Verificar si el pedido existe en la base de datos
+    existing_order = conn.execute(
+        select(Pedido_table).where(Pedido_table.idPedido == id)
+    ).fetchone()
+    if not existing_order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="El pedido no existe"
+        )
+
+    try:
+        # Crear la consulta para actualizar el pedido en la base de datos
+        query = (
+            update(Pedido_table)
+            .where(Pedido_table.idPedido == id)
+            .values(
+                estado = "Entregado"
+            )
+        )
+        # Ejecutar la consulta para actualizar el producto en la base de datos
+        db.execute(query)
+
+        # Realizar el commit para guardar los cambios en la base de datos
+        db.commit()
+
+        return {"mensaje" : "El pedido se marcó como entregado exitosamente"}
+    except Exception as e:
+        # Manejar errores en la base de datos u otros errores inesperados
+        error_message = "Error interno del servidor"
+        if isinstance(e, SQLAlchemyError):
+            error_message = str(e.__dict__['orig'])
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=error_message,
+        )
+    
