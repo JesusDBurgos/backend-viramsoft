@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes.index import productosR, clientesR, pedidosR, comprobantePedido
+from routes.index import productosR, clientesR, pedidosR, comprobantePedido, dashboardR
 from auth.auth import auth_router
 from config.database import create_tables
 from models.index import Cliente_table,Producto_table,DetallePedido_table,Pedido_table,User
@@ -21,6 +21,7 @@ app.include_router(productosR)
 app.include_router(clientesR)
 app.include_router(pedidosR)
 app.include_router(comprobantePedido)
+app.include_router(dashboardR)
 
 # Inicializar el proyecto
 def initialize_project():
