@@ -9,7 +9,6 @@ class DetallePedido_table(Base):
     idProducto = Column( Integer, ForeignKey("producto.idProducto"), primary_key=True, nullable=False)
     cantidad = Column( Integer, nullable=False)
     precio = Column(Float, nullable=False)
-
     pedido = relationship("Pedido_table", back_populates="detalles")
     producto = relationship("Producto_table", back_populates="detalles")
 
