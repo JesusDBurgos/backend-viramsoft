@@ -1,3 +1,4 @@
+from collections import defaultdict
 from fastapi import APIRouter, Depends,status, Response, HTTPException, Query
 from config.database import conn,get_db
 from models.index import Pedido_table,DetallePedido_table, Producto_table, Cliente_table
@@ -72,9 +73,8 @@ def obtener_ventas_por_semana(
     # Calcular la fecha de fin de la semana que pasó
     fecha_fin_semana = fecha_actual
 
-    # Inicializa las listas para almacenar las etiquetas (días de la semana) y los datos (ventas)
-    labels = []
-    datos_ventas = []
+    # Diccionario para almacenar las ventas por día de la semana
+    ventas_por_dia = defaultdict(float)
 
     # Diccionario que mapea los números de día de la semana a nombres en español
     nombres_dias_semana = {
@@ -99,14 +99,25 @@ def obtener_ventas_por_semana(
 
         # Itera sobre los pedidos para obtener las ventas por día
         for venta in ventas_semana:
+            print(venta.fechaEntrega)
             # Obtener el día de la semana en numero de la fecha de entrega
             dia_semana = venta.fechaEntrega.weekday()
+            print(dia_semana)
             # Obtener el nombre del día de la semana en texto
             dia_semana = nombres_dias_semana.get(dia_semana)
+            print(dia_semana)
             # Agregar la etiqueta y el dato correspondiente
-            labels.append(dia_semana)
-            datos_ventas.append(venta.valorTotal)
+            ventas_por_dia[dia_semana] += venta.valorTotal
+    # Generar etiquetas de los días de la semana desde hoy hasta hace una semana
+    labels = []
+    current_date = fecha_inicio_semana
+    while current_date <= fecha_actual:
+        dia_semana = nombres_dias_semana.get(current_date.weekday())  # Obtener el nombre del día de la semana
+        labels.append(dia_semana)
+        current_date += timedelta(days=1)
 
+    # Llenar datos para los días no presentes en las ventas
+    datos_ventas = [ventas_por_dia[dia] for dia in labels]
     # Formatea los datos en la estructura deseada
     data = {
         "labels": labels,
