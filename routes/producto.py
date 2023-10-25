@@ -13,8 +13,6 @@ from config.database import conn, get_db
 from models.index import Producto_table, ImagenProducto
 from schemas.index import ProductoPydantic, ProductoUpdatePydantic
 from sqlalchemy.orm import Session, joinedload
-import pymysql
-from sqlalchemy.dialects import mysql
 from sqlalchemy import select, update
 from typing import List
 import base64
@@ -42,57 +40,31 @@ async def get_products(db: Session = Depends(get_db)):
     Returns:
         dict: Un diccionario JSON con la lista de productos y sus imágenes.
     """
-
-    hostName        = "34.176.76.49"
-
-    userName        = "root"
-
-    userPassword    = "viramsoftsena"
-
-    databaseName    = "viramsoft"
-
-    databaseCharset = "utf8mb4"
-
-    cursorType      = pymysql.cursors.DictCursor
-
-    databaseConnection   = pymysql.connect(host=hostName,
-
-                                       user=userName,
-
-                                       password=userPassword,
-
-                                       db=databaseName,
-
-                                       charset=databaseCharset,
-
-                                       cursorclass=cursorType)
-
-    # Obtener cursor 
-    cursor = databaseConnection.cursor()
-    cursor.execute('call sp_get_products')
-
-    products = cursor.fetchall()
+    # Consulta todos los productos y sus imágenes correspondientes utilizando una carga conjunta (joinedload)
+    products = (
+        db.query(Producto_table).options(
+            joinedload(Producto_table.imagenes)).all()
+    )
 
     product_list = []
-    print(products)
-    for row in products:
-        product = {
-            "idProducto": row[0],
-            "nombre": row[1], 
-            "marca": row[2],
-            "categoria": row[3],
-            "cantidad": row[4],
-            "valorCompra": row[5],
-            "valorVenta": row[6],
-            "unidadMedida": row[7],
-            "imagenes" : [base64.b64encode(row[8]).decode("utf-8")]
-        }  
-        product_list.append(product)
-        print(product)
-    
-    # if row[8]:
-    #     product["imagenes"] = [base64.b64encode(row[8]).decode("utf-8")]
-
+    print(products)    for product in products:
+        product_dict = {
+            "idProducto": product.idProducto,
+            "nombre": product.nombre,
+            "marca": product.marca,
+            "categoria": product.categoria,
+            "cantidad": product.cantidad,
+            "valorCompra": product.valorCompra,
+            "valorVenta": product.valorVenta,
+            "unidadMedida": product.unidadMedida,
+        }
+        if product.imagenes:
+            # Si hay imágenes asociadas al producto, inclúyelas en el diccionario
+            product_dict["imagenes"] = [
+                base64.b64encode(imagen.imagen).decode("utf-8")
+                for imagen in product.imagenes
+            ]
+        product_list.append(product_dict)
 
     return {"productos": product_list}
 
