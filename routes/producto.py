@@ -71,11 +71,10 @@ async def get_products(db: Session = Depends(get_db)):
     cursor = databaseConnection.cursor()
     cursor.execute('call sp_get_products')
 
-    cursor.fetchall()
-    products = cursor
+    products = cursor.fetchall()
 
     product_list = []
-
+    print(products)
     for row in products:
         product = {
             "idProducto": row[0],
