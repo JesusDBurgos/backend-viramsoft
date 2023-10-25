@@ -22,6 +22,7 @@ def obtener_ventas_por_periodo(
         )
     # Calcula la fecha de inicio y fin del período
     fecha_fin = datetime.now()
+    fecha_inicio = fecha_fin - timedelta(weeks=semanas_atras)
 
     # Inicializa las listas para almacenar las etiquetas (período) y los datos (ventas)
     labels = []
@@ -45,7 +46,9 @@ def obtener_ventas_por_periodo(
 
             # Calcula el total de ventas en la semana y agrega la etiqueta y el dato correspondiente
             for venta in ventas_semana:
+                print(venta.valorTotal)
                 total_ventas_semana += venta.valorTotal
+                print(total_ventas_semana)
             labels.append(fecha_final_semana.strftime("%Y/%m/%d") + "-" + fecha_inicial_semana.strftime("%Y/%m/%d"))
             datos_ventas.append(total_ventas_semana)
 
@@ -107,14 +110,12 @@ def obtener_ventas_por_semana(
             ventas_por_dia[dia_semana] += venta.valorTotal
     # Generar etiquetas de los días de la semana desde hoy hasta hace una semana
     labels = []
-    fecha_inicio_semana = fecha_inicio_semana + timedelta(days=1)
-    print(fecha_inicio_semana)
-    print(fecha_actual)
-    while fecha_actual >= fecha_inicio_semana:
-        dia_semana = nombres_dias_semana.get(fecha_actual.weekday())  # Obtener el nombre del día de la semana
-        fecha_actual -= timedelta(days=1)
+    current_date = fecha_inicio_semana
+    while current_date <= fecha_actual:
+        dia_semana = nombres_dias_semana.get(current_date.weekday())  # Obtener el nombre del día de la semana
         labels.append(dia_semana)
-        
+        current_date += timedelta(days=1)
+
     # Llenar datos para los días no presentes en las ventas
     datos_ventas = [ventas_por_dia[dia] for dia in labels]
     # Formatea los datos en la estructura deseada
