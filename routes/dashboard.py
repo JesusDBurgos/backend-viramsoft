@@ -4,8 +4,9 @@ from config.database import conn,get_db
 from models.index import Pedido_table,DetallePedido_table, Producto_table, Cliente_table
 from schemas.index import PedidoAggPydantic,ProductoPydantic, ProductosPedAggPydantic 
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import select,update, text
+from sqlalchemy import select,update, text,desc, func
 from datetime import datetime, timedelta
+import calendar
 from itertools import count
 from typing import List
 
@@ -125,3 +126,87 @@ def obtener_ventas_por_semana(
 
     return data
 
+@dashboardR.get("/indicadores_dashboard")
+def obtener_ventas_por_semana(
+    db: Session = Depends(get_db)
+):
+    # Obtener la fecha actual
+    fecha_actual = datetime.now()
+    fecha_actual = fecha_actual 
+    # Obtén el primer día del mes actual
+    primer_dia_mes_actual = fecha_actual.replace(day=1).replace(hour=0).replace(minute=0).replace(second=0).replace(microsecond=0)
+    ultimo_dia_mes_actual = fecha_actual.replace(day=calendar.monthrange(fecha_actual.year, fecha_actual.month)[1]).replace(hour=23).replace(minute=59).replace(second=59)
+
+    print(primer_dia_mes_actual,ultimo_dia_mes_actual)
+    
+    total_pedidos = (
+        db.query(func.sum(Pedido_table.valorTotal))
+        .filter(Pedido_table.fechaEntrega <= ultimo_dia_mes_actual, Pedido_table.fechaEntrega >= primer_dia_mes_actual, Pedido_table.estado == "Entregado")
+        .scalar()  # Utiliza scalar() para obtener un único valor en lugar de una tupla
+    )
+
+    pedidos_entregados = (
+        db.query(func.count(Pedido_table.valorTotal))
+        .filter(Pedido_table.fechaEntrega <= ultimo_dia_mes_actual, Pedido_table.fechaEntrega >= primer_dia_mes_actual, Pedido_table.estado == "Entregado")
+        .scalar()  # Utiliza scalar() para obtener un único valor en lugar de una tupla
+    )
+
+    ultimos_pedidos = (
+        db.query(Pedido_table)
+        .filter(Pedido_table.fechaEntrega <= ultimo_dia_mes_actual, Pedido_table.fechaEntrega >= primer_dia_mes_actual, Pedido_table.estado == "Entregado")
+        .order_by(desc(Pedido_table.fechaEntrega))
+        .limit(8)
+        .all()
+    )
+
+    clientes_nuevos = (db.query(func.count(Cliente_table.documento)).filter(Cliente_table.fecha_agregado <= ultimo_dia_mes_actual, Cliente_table.fecha_agregado >= primer_dia_mes_actual, Cliente_table.estado == "ACTIVO").scalar())
+
+
+    porcentajes = {}
+
+    if primer_dia_mes_actual.month == 1: 
+        primer_dia_mes_pasado = primer_dia_mes_actual.replace(year=primer_dia_mes_actual.year - 1, month=12)
+    else:
+        primer_dia_mes_pasado = primer_dia_mes_actual.replace(month=primer_dia_mes_actual.month - 1)
+
+    # Calcular el último día del mes pasado
+    if ultimo_dia_mes_actual.month == 1:  # Si el mes actual es enero
+        ultimo_dia_mes_pasado = ultimo_dia_mes_actual.replace(year=fecha_actual.year - 1, month=12,day=2)
+        ultimo_dia_mes_pasado = ultimo_dia_mes_pasado.replace(day=calendar.monthrange(ultimo_dia_mes_pasado.year, ultimo_dia_mes_pasado.month)[1])
+    else:
+        ultimo_dia_mes_pasado = ultimo_dia_mes_actual.replace(month=ultimo_dia_mes_actual.month - 1,day=5)
+        ultimo_dia_mes_pasado = ultimo_dia_mes_pasado.replace(day=calendar.monthrange(ultimo_dia_mes_pasado.year, ultimo_dia_mes_pasado.month)[1])
+
+    total_pedidos_mes_pasado = (
+        db.query(func.sum(Pedido_table.valorTotal))
+        .filter(Pedido_table.fechaEntrega <= ultimo_dia_mes_pasado, Pedido_table.fechaEntrega >= primer_dia_mes_pasado, Pedido_table.estado == "Entregado")
+        .scalar()  # Utiliza scalar() para obtener un único valor en lugar de una tupla
+    )
+
+    pedidos_entregados_mes_pasado = (
+        db.query(func.count(Pedido_table.valorTotal))
+        .filter(Pedido_table.fechaEntrega <= ultimo_dia_mes_pasado, Pedido_table.fechaEntrega >= primer_dia_mes_pasado, Pedido_table.estado == "Entregado")
+        .scalar()  # Utiliza scalar() para obtener un único valor en lugar de una tupla
+    )
+
+    clientes_nuevos_mes_pasado = (db.query(func.count(Cliente_table.documento)).filter(Cliente_table.fecha_agregado <= ultimo_dia_mes_pasado, Cliente_table.fecha_agregado >= primer_dia_mes_pasado, Cliente_table.estado == "ACTIVO").scalar())
+
+    if total_pedidos_mes_pasado is None or total_pedidos_mes_pasado == 0:
+        porc_total_pedidos = 100
+    else:
+        porc_total_pedidos = ((total_pedidos - total_pedidos_mes_pasado) / total_pedidos_mes_pasado) * 100
+    if pedidos_entregados_mes_pasado is None or pedidos_entregados_mes_pasado == 0:
+        porc_pedidos_entregados = 100
+    else:
+        porc_pedidos_entregados = ((pedidos_entregados - pedidos_entregados_mes_pasado) / pedidos_entregados_mes_pasado) * 100
+    if clientes_nuevos_mes_pasado is None or clientes_nuevos_mes_pasado == 0:
+        porc_clientes_nuevos = 100
+    else:
+        porc_clientes_nuevos = ((clientes_nuevos - clientes_nuevos_mes_pasado) / clientes_nuevos_mes_pasado) * 100
+
+    porcentajes["porc_total_pedidos"] = f"{porc_total_pedidos}%"
+    porcentajes["porc_pedidos_entregados"] = f"{porc_pedidos_entregados}%"
+    porcentajes["porc_clientes_nuevos"] = f"{porc_clientes_nuevos}%"
+    print(primer_dia_mes_actual,primer_dia_mes_pasado)
+
+    return total_pedidos, clientes_nuevos, pedidos_entregados, ultimos_pedidos, porcentajes
