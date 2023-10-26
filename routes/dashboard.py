@@ -161,8 +161,14 @@ def obtener_ventas_por_semana(
 
     clientes_nuevos = (db.query(func.count(Cliente_table.documento)).filter(Cliente_table.fecha_agregado <= ultimo_dia_mes_actual, Cliente_table.fecha_agregado >= primer_dia_mes_actual, Cliente_table.estado == "ACTIVO").scalar())
 
+    valores = {}
+
+    valores["total_pedidos"] = f"{total_pedidos}"
+    valores["pedidos_entregados"] = f"{pedidos_entregados}"
+    valores["clientes_nuevos"] = f"{clientes_nuevos}"
 
     porcentajes = {}
+
 
     if primer_dia_mes_actual.month == 1: 
         primer_dia_mes_pasado = primer_dia_mes_actual.replace(year=primer_dia_mes_actual.year - 1, month=12)
@@ -209,4 +215,4 @@ def obtener_ventas_por_semana(
     porcentajes["porc_clientes_nuevos"] = f"{porc_clientes_nuevos}%"
     print(primer_dia_mes_actual,primer_dia_mes_pasado)
 
-    return total_pedidos, clientes_nuevos, pedidos_entregados, ultimos_pedidos, porcentajes
+    return valores, ultimos_pedidos, porcentajes
