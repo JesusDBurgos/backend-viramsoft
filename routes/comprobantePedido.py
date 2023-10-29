@@ -36,6 +36,7 @@ async def generar_comprobanteP(
     if pedido:
         # Acceder al atributo documentoCliente del objeto Pedido
         documento_cliente = pedido.documentoCliente
+        vendedor = pedido.vendedor
         valor_total = pedido.valorTotal
         fecha_pedido = pedido.fechaPedido
         fecha_entrega = pedido.fechaEntrega
@@ -95,11 +96,15 @@ async def generar_comprobanteP(
     style_bold_total.spaceBefore = 25
 
     fecha_juntas = Paragraph(
-        f"<b>Número de Pedido:</b> {pedido_id} &nbsp;&nbsp;&nbsp; <b>Fecha de pedido:</b> {fecha_pedido} &nbsp;&nbsp;&nbsp;&nbsp; <b>Fecha de entrega:</b>{fecha_entrega}",
+        f"<b>Número de Pedido:</b> {pedido_id} &nbsp;&nbsp;&nbsp; <b>Fecha de pedido:</b> {fecha_pedido} &nbsp;&nbsp;&nbsp;&nbsp; <b>Fecha de entrega:</b> {fecha_entrega}",
         style_left,
     )
     cliente = Paragraph(
-        f"<b>Cliente:</b> {nombre_cliente} &nbsp;&nbsp;&nbsp; <b>Dirección:</b> {direccion_cliente} &nbsp;&nbsp;&nbsp; <b>Teléfono:</b> {telefono_cliente}",
+        f"<b>Cliente:</b> {nombre_cliente} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>Dirección:</b> {direccion_cliente} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <b>Teléfono:</b> {telefono_cliente}",
+        style_left,
+    )
+    vendedor_texto = Paragraph(
+        f"<b>Vendedor:</b> {vendedor}",
         style_left,
     )
 
@@ -108,6 +113,7 @@ async def generar_comprobanteP(
     elements.append(Paragraph(f"Comprobante de Pedido", style_left_encabezado))
     elements.append(fecha_juntas)
     elements.append(cliente)
+    elements.append(vendedor_texto)
 
     # Crear una tabla para listar los productos
     data = [["Producto", "Cantidad", "Precio Unitario", "Total"]]

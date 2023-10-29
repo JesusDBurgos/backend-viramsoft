@@ -7,6 +7,7 @@ class Pedido_table(Base):
     __tablename__ = "pedido"
     idPedido = Column( Integer,primary_key=True, autoincrement=True, nullable=False)
     documentoCliente = Column(String(255), ForeignKey("cliente.documento"), nullable=False)
+    vendedor = Column(String(50), nullable=True)
     observacion = Column(String(255), nullable=True)
     fechaPedido = Column(Date, nullable=False)
     fechaEntrega = Column(Date,nullable=False )

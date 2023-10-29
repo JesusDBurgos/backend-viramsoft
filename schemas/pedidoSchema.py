@@ -15,6 +15,7 @@ class PedidoAggPydantic(BaseModel):
     documentoCliente: str = "123"
     fechaEntrega: date = date(2023,7, 30)
     observacion: str = "Todo con normalidad"
+    token: str
 
 class valorPedPydantic(BaseModel):
     valorTotal: float

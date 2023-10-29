@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends,status, Response, HTTPException
 from config.database import conn,get_db
 from models.index import Pedido_table,DetallePedido_table, Producto_table, Cliente_table
+from auth.jwt import decode_token
 from schemas.index import PedidoAggPydantic,ProductoPydantic, ProductosPedAggPydantic 
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import select,update, text
@@ -34,6 +35,7 @@ def get_orders(db: Session = Depends(get_db)):
     for order in orders:
         order_dict = {
             "documentoCliente": order.clientes.documento,  # Obtener el documento del cliente
+            "vendedor": order.vendedor,
             "observacion": order.observacion,
             "fechaEntrega": str(order.fechaEntrega),
             "estado": order.estado,
@@ -88,8 +90,10 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
     fecha_actual = datetime.now()
     fecha_pedido = fecha_actual.strftime("%Y-%m-%d")
     fecha_entrega_str = pedido.fechaEntrega.strftime("%Y-%m-%d")
+    vendedor = decode_token(pedido.token)
     db_pedido = Pedido_table(
                               documentoCliente = pedido.documentoCliente,
+                              vendedor = vendedor["name"],
                               observacion = pedido.observacion,
                               fechaPedido= fecha_pedido,
                               fechaEntrega= fecha_entrega_str,
