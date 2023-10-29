@@ -47,7 +47,7 @@ def obtener_ventas_por_periodo(
             # Calcula el total de ventas en la semana y agrega la etiqueta y el dato correspondiente
             for venta in ventas_semana:
                 total_ventas_semana += venta.valorTotal
-            labels.append(fecha_final_semana.strftime("%Y/%m/%d") + "-" + fecha_inicial_semana.strftime("%Y/%m/%d"))
+            labels.append(fecha_inicial_semana.strftime("%Y/%m/%d"))
             datos_ventas.append(total_ventas_semana)
 
     # Formatea los datos en la estructura deseada
