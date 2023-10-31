@@ -1,0 +1,158 @@
+40ea7dc,JesusDBurgos,cambio en respuesta dashboard,Sat Oct 28 23:30:43 2023 -0500
+2e447dc,JesusDBurgos,Añadir gestión de usuarios,Sat Oct 28 21:08:26 2023 -0500
+d705b0f,JesusDBurgos,cambio en respuesta endpoint indicadores_dashboard,Thu Oct 26 01:13:56 2023 -0500
+8dbfeea,JesusDBurgos,agregar endpoint de indicadores dashboard,Thu Oct 26 00:08:50 2023 -0500
+091620e,JesusDBurgos,Revert "cambiosxD",Wed Oct 25 17:51:39 2023 -0500
+12b687b,JesusDBurgos,Merge branch 'main' of https://github.com/JesusDBurgos/backend-viramsoft,Wed Oct 25 06:40:03 2023 -0500
+fc00e2d,JesusDBurgos,Revert "Revert "cambios endpoint ventas por semana"",Wed Oct 25 06:37:55 2023 -0500
+83b0e1a,JesusDBurgos,Revert "Revert "cambios endpoint ventas por semana"",Wed Oct 25 06:37:55 2023 -0500
+3b8047d,JesusDBurgos,Revert "cambios endpoint ventas por semana",Wed Oct 25 06:36:58 2023 -0500
+9ef81f2,JesusDBurgos,cambiosxD,Thu Oct 19 11:29:23 2023 -0500
+3abb4ca,JesusDBurgos,cambios endpoint ventas por semana,Wed Oct 18 11:21:42 2023 -0500
+0840a33,JesusDBurgos,cambio de la instancia de base de datos,Wed Oct 18 09:30:16 2023 -0500
+ec9c948,JesusDBurgos,Actualización de endpoint de consulta semanal - visualizaciones,Tue Oct 17 11:04:55 2023 -0500
+ec8c375,JesusDBurgos,Añadir endpoints de consultas para visualizaciones,Sun Oct 15 20:43:36 2023 -0500
+8b36c73,JesusDBurgos,añadir nuevo router para dashboard,Thu Oct 12 23:43:02 2023 -0500
+114a57e,JesusDBurgos,Creación de endpoint para cambiar estado de pedido a cancelado,Thu Oct 12 23:04:56 2023 -0500
+8655306,JesusDBurgos,cambio en estados de clientes y sus consultas,Tue Oct 3 18:01:15 2023 -0500
+fbe0e39,JesusDBurgos,Añadir endpoint cambio de estado de pedido a entregado,Tue Oct 3 17:28:07 2023 -0500
+4859378,JesusDBurgos,endpoint version response base64,Sat Sep 30 18:53:58 2023 -0500
+2936494,JesusDBurgos,Revert "Cambio en respuesta comprobante pedido",Sat Sep 30 18:53:28 2023 -0500
+43c57e9,JesusDBurgos,Cambio en respuesta comprobante pedido,Thu Sep 28 10:34:55 2023 -0500
+0104e9e,JesusDBurgos,Cambio en respuesta comprobante de pedido,Thu Sep 28 06:32:38 2023 -0500
+9b2c181,JesusDBurgos,cambio en endpoint actualizar producto - correcion,Wed Sep 27 10:28:30 2023 -0500
+0811ba4,JesusDBurgos,cambio en editar producto, edita imagenes,Wed Sep 27 08:46:17 2023 -0500
+5db2948,JesusDBurgos,cambios en formato,Wed Sep 27 07:40:00 2023 -0500
+7df2c6d,JesusDBurgos,Cambio en comprobante pedido, descarga automatica,Wed Sep 27 07:11:32 2023 -0500
+fa237db,JesusDBurgos,Cambio en respuesta de endpoint de producto,Wed Sep 27 06:56:46 2023 -0500
+de2563a,JesusDBurgos,Modificar endpoint de crear producto, añade imagen,Wed Sep 27 06:46:13 2023 -0500
+7c70aee,JesusDBurgos,prueba 13,Wed Sep 27 06:30:43 2023 -0500
+7b868f2,JesusDBurgos,prueba #999,Tue Sep 26 11:26:47 2023 -0500
+f9cf7ec,JesusDBurgos,prueba #7,Tue Sep 26 11:10:34 2023 -0500
+4c4301f,JesusDBurgos,prueba 6,Tue Sep 26 10:26:13 2023 -0500
+19f246f,JesusDBurgos,prueba 5.1,Tue Sep 26 10:18:43 2023 -0500
+19001a7,JesusDBurgos,prueba 5,Tue Sep 26 10:08:41 2023 -0500
+5786069,JesusDBurgos,prueba #3,Tue Sep 26 10:02:11 2023 -0500
+d546ce0,JesusDBurgos,prueba #2,Tue Sep 26 09:29:50 2023 -0500
+effd49d,JesusDBurgos,prueba #01 endpoint crear producto,Tue Sep 26 09:18:41 2023 -0500
+2d950f8,JesusDBurgos,Cambio a limite de 16MB por foto,Fri Sep 22 13:55:10 2023 -0500
+3f1c6ab,JesusDBurgos,Correción en modelo de tabla imagenes_productos,Fri Sep 22 13:50:08 2023 -0500
+3e67b51,JesusDBurgos,cambio en Store Procedure y endpoint get detalle pedido,Thu Sep 21 20:24:55 2023 -0500
+6df25fd,JesusDBurgos,Corrección error de valores en comprobante pedido,Thu Sep 21 20:07:05 2023 -0500
+05b3b24,JesusDBurgos,Cambio en formato visual de pdf comprobante pedido,Wed Sep 20 11:19:51 2023 -0500
+45824ac,JesusDBurgos,cambio en generación de pdf de comprobande,Tue Sep 19 11:30:44 2023 -0500
+0e406cf,JesusDBurgos,Cambio en respuesta de endpoint consulta detalle pedido,Tue Sep 19 09:14:04 2023 -0500
+07a4f35,JesusDBurgos,Corregir validación en endpoint de crear pedido,Tue Sep 19 08:53:49 2023 -0500
+d250bd1,JesusDBurgos,Cambio en respuesta de endpoint consulta de productos,Tue Sep 19 07:54:20 2023 -0500
+535a1b6,JesusDBurgos,Merge branch 'main' of https://github.com/JesusDBurgos/backend-viramsoft,Tue Sep 19 07:21:53 2023 -0500
+1842a43,JesusDBurgos,añadir endpoint consulta productos disponibles,Tue Sep 19 07:20:34 2023 -0500
+35dd078,Jesus David Burgos Torres,Update requirements.txt,Tue Sep 19 06:37:00 2023 -0500
+d13acd2,JesusDBurgos,Añadir endpoint de comprobante de pedido en pdf,Mon Sep 18 11:23:51 2023 -0500
+0d3023c,JesusDBurgos,Agregar endpoint de detalle de pedido,Mon Sep 18 05:43:58 2023 -0500
+3248ad0,JesusDBurgos,Actualización endpoint consulta productos para recibir la imagen si la tiene,Thu Sep 14 11:25:26 2023 -0500
+3872386,JesusDBurgos,Añadir condicional para añadir si el producto no tiene foto, o editarla si ya tiene foto,Thu Sep 14 10:57:59 2023 -0500
+4d1e904,JesusDBurgos,Error index schemas - Detalle mínimo eliminado,Thu Sep 14 10:33:55 2023 -0500
+d2fbb6e,JesusDBurgos,Añadir endpoint para cargar imagenes,Thu Sep 14 10:07:58 2023 -0500
+b886569,JesusDBurgos,Merge branch 'main' of https://github.com/JesusDBurgos/backend-viramsoft,Thu Sep 14 06:28:55 2023 -0500
+18dd135,JesusDBurgos,Cambio de referencias de llave foranea en imagenes_productos,Thu Sep 14 06:27:55 2023 -0500
+0118217,Jesus David Burgos Torres,Update requirements.txt,Thu Sep 14 06:22:25 2023 -0500
+f5d496c,JesusDBurgos,Añadir endpoint de subir imagen,Wed Sep 13 11:27:22 2023 -0500
+6cefef1,JesusDBurgos,Añadir modelo imagenes y detalles adicionales...,Tue Sep 12 23:07:55 2023 -0500
+0626318,JesusDBurgos,Cambios en integridad referencial,Tue Sep 12 14:54:49 2023 -0500
+2794c2b,JesusDBurgos,bug insertar pedido,Tue Sep 12 10:54:21 2023 -0500
+4d20c84,Jesus David Burgos Torres,Update requirements.txt,Mon Sep 11 10:52:15 2023 -0500
+c5d5e7d,Jesus David Burgos Torres,Update requirements.txt,Mon Sep 11 10:38:04 2023 -0500
+9d80e3d,JesusDBurgos,Se agrega función async para consultar productos,Mon Sep 11 10:37:24 2023 -0500
+0d717ec,JesusDBurgos,Revert "Actualización de endpint crear pedido ASYNC",Mon Sep 11 09:58:35 2023 -0500
+556c236,JesusDBurgos,Revert "Merge branch 'main' of https://github.com/JesusDBurgos/backend-viramsoft",Mon Sep 11 09:57:51 2023 -0500
+2c10bb7,JesusDBurgos,Merge branch 'main' of https://github.com/JesusDBurgos/backend-viramsoft,Mon Sep 11 09:39:39 2023 -0500
+c222a18,JesusDBurgos,Actualización de endpint crear pedido ASYNC,Mon Sep 11 09:37:29 2023 -0500
+9678a76,Jesus David Burgos Torres,Update requirements.txt,Mon Sep 11 09:36:48 2023 -0500
+c2bee47,JesusDBurgos,Update pedidoModel.py,Tue Aug 15 00:37:44 2023 -0500
+922a693,JesusDBurgos,detallito,Tue Aug 15 00:34:51 2023 -0500
+32ab1dc,JesusDBurgos,Cambios en configuración de relaciones modelos,Tue Aug 15 00:30:06 2023 -0500
+ceb6a0d,JesusDBurgos,Update detallePedModel.py,Tue Aug 15 00:19:31 2023 -0500
+8bf4bf0,JesusDBurgos,Update pedidos.py,Tue Aug 15 00:12:44 2023 -0500
+f9d7c15,JesusDBurgos,Update pedidos.py,Mon Aug 14 23:43:27 2023 -0500
+2c0cde9,JesusDBurgos,Update pedidos.py,Mon Aug 14 23:18:07 2023 -0500
+a65ff7a,JesusDBurgos,Update pedidos.py,Mon Aug 14 22:08:33 2023 -0500
+8ed41d4,JesusDBurgos,Update pedidos.py,Mon Aug 14 21:44:56 2023 -0500
+274831c,JesusDBurgos,Update pedidos.py,Mon Aug 14 21:35:49 2023 -0500
+b00a57d,JesusDBurgos,Update pedidos.py,Mon Aug 14 21:13:47 2023 -0500
+cdf5d19,JesusDBurgos,definir la list que contendra objetos para el orm,Mon Aug 14 20:54:47 2023 -0500
+86c0a8c,JesusDBurgos,cambios en logica de inserccion objetos orm,Mon Aug 14 20:49:44 2023 -0500
+ed0c3e4,JesusDBurgos,Update pedidos.py,Mon Aug 14 20:30:38 2023 -0500
+8d981a8,JesusDBurgos,Correccion endpoint crear pedido,Mon Aug 14 18:12:28 2023 -0500
+f81d099,JesusDBurgos,eliminar formato de moneda,Sat Aug 12 19:54:35 2023 -0500
+730d799,JesusDBurgos,Update producto.py,Tue Aug 8 19:27:22 2023 -0500
+ed22fea,JesusDBurgos,cambio en manejo del orm,Fri Aug 4 19:13:52 2023 -0500
+0e28ee0,JesusDBurgos,Cambio en formatos de valores monetarios,Fri Aug 4 16:58:46 2023 -0500
+edb6bc7,JesusDBurgos,Update producto.py,Fri Aug 4 12:34:01 2023 -0500
+103440b,JesusDBurgos,Update producto.py,Thu Aug 3 11:21:39 2023 -0500
+2219016,JesusDBurgos,Revert "Update producto.py",Thu Aug 3 11:21:09 2023 -0500
+6d89154,JesusDBurgos,Revert "Update pedidos.py",Thu Aug 3 11:19:00 2023 -0500
+801e80d,JesusDBurgos,Update producto.py,Thu Aug 3 11:06:27 2023 -0500
+1ec48da,JesusDBurgos,Update producto.py,Thu Aug 3 10:55:31 2023 -0500
+f67d505,JesusDBurgos,Update producto.py,Thu Aug 3 10:51:46 2023 -0500
+ce06a83,JesusDBurgos,Update producto.py,Thu Aug 3 10:29:50 2023 -0500
+4f1784c,JesusDBurgos,Update pedidos.py,Tue Aug 1 19:41:17 2023 -0500
+865c782,JesusDBurgos,Update pedidos.py,Tue Aug 1 19:34:05 2023 -0500
+23bb539,JesusDBurgos,Update pedidos.py,Tue Aug 1 19:27:49 2023 -0500
+87fc85d,JesusDBurgos,Update jwt.py,Mon Jul 31 09:28:32 2023 -0500
+f95d1b9,JesusDBurgos,Update clientes.py,Sun Jul 30 21:51:09 2023 -0500
+b513baf,JesusDBurgos,Arreglo endpoint update_data,Sun Jul 30 21:41:03 2023 -0500
+e0a16eb,JesusDBurgos,Cambios endpoint create_order,Sun Jul 30 13:44:14 2023 -0500
+03ee639,JesusDBurgos,cambio en endpoint update_product,Sat Jul 29 22:51:43 2023 -0500
+420d2b0,JesusDBurgos,Update producto.py,Sat Jul 29 22:36:46 2023 -0500
+9bf140d,JesusDBurgos,Update producto.py,Sat Jul 29 22:31:02 2023 -0500
+9ec0888,JesusDBurgos,Update producto.py,Sat Jul 29 22:28:24 2023 -0500
+de12609,JesusDBurgos,Update producto.py,Sat Jul 29 22:16:04 2023 -0500
+be25509,JesusDBurgos,Update producto.py,Sat Jul 29 22:03:08 2023 -0500
+fa5831a,JesusDBurgos,Update producto.py,Sat Jul 29 21:57:55 2023 -0500
+833efc8,JesusDBurgos,Update producto.py,Sat Jul 29 21:54:06 2023 -0500
+3290e85,JesusDBurgos,Update producto.py,Sat Jul 29 21:39:45 2023 -0500
+c0b7ffe,JesusDBurgos,Update producto.py,Sat Jul 29 16:59:20 2023 -0500
+a817cd2,JesusDBurgos,Update producto.py,Sat Jul 29 16:55:52 2023 -0500
+9da776b,JesusDBurgos,Update producto.py,Sat Jul 29 16:52:01 2023 -0500
+8858a42,JesusDBurgos,Update producto.py,Sat Jul 29 16:45:24 2023 -0500
+3383e97,JesusDBurgos,Cambio en auth y productos,Sat Jul 29 16:40:18 2023 -0500
+e34a17c,JesusDBurgos,Update producto.py,Sat Jul 29 16:34:13 2023 -0500
+0581b92,JesusDBurgos,Eliminar campo fecha de vencimiento,Sat Jul 29 16:24:32 2023 -0500
+588563c,JesusDBurgos,Cambio en ruta clientes,Sat Jul 29 00:57:18 2023 -0500
+aaacdab,JesusDBurgos,Update clientes.py,Fri Jul 28 19:31:40 2023 -0500
+4fa3475,JesusDBurgos,Update clientes.py,Fri Jul 28 19:24:29 2023 -0500
+cacabde,JesusDBurgos,Update clientes.py,Fri Jul 28 19:12:25 2023 -0500
+99a35ae,JesusDBurgos,Update clientes.py,Fri Jul 28 19:05:20 2023 -0500
+88e3b96,JesusDBurgos,cambios endpoints,Fri Jul 28 17:22:28 2023 -0500
+54993d9,JesusDBurgos,Update clientes.py,Fri Jul 28 13:47:47 2023 -0500
+3963a99,JesusDBurgos,Update clientes.py,Fri Jul 28 13:37:15 2023 -0500
+17601e9,JesusDBurgos,Update clientes.py,Thu Jul 27 11:25:48 2023 -0500
+4a98087,JesusDBurgos,Cambio cliente añadir estados,Thu Jul 27 11:07:41 2023 -0500
+d97a74a,JesusDBurgos,Update producto.py,Thu Jul 27 10:03:44 2023 -0500
+0410b4d,JesusDBurgos,Update producto.py,Thu Jul 27 09:57:12 2023 -0500
+1e85256,JesusDBurgos,Cambios producto,Thu Jul 27 09:41:17 2023 -0500
+9e63361,JesusDBurgos,Update producto.py,Thu Jul 27 09:18:17 2023 -0500
+48f4cbf,JesusDBurgos,Update producto.py,Thu Jul 27 08:29:55 2023 -0500
+f48347e,JesusDBurgos,Cambios esquema,Thu Jul 27 08:21:04 2023 -0500
+480239e,JesusDBurgos,Cambios tabla clientes y consulta de productos,Thu Jul 27 08:08:40 2023 -0500
+5ddc5f6,JesusDBurgos,Cambios model/schema producto,Wed Jul 26 19:32:59 2023 -0500
+f48b5fd,JesusDBurgos,Merge branch 'main' of https://github.com/JesusDBurgos/backend-viramsoft,Wed Jul 26 16:27:48 2023 -0500
+1fd655e,JesusDBurgos,Update auth.py,Wed Jul 26 16:27:25 2023 -0500
+aba528d,JesusDBurgos,Update requirements.txt,Wed Jul 26 16:24:13 2023 -0500
+871f7e6,JesusDBurgos,Update requirements.txt,Wed Jul 26 16:08:46 2023 -0500
+15d79bd,JesusDBurgos,Update requirements.txt,Wed Jul 26 16:02:39 2023 -0500
+7ce4326,JesusDBurgos,Update auth.py,Wed Jul 26 15:55:41 2023 -0500
+333d30a,JesusDBurgos,Cambio archivo config db,Wed Jul 26 15:50:26 2023 -0500
+4c895ab,JesusDBurgos,Añadir logica de autenticación,Wed Jul 26 15:41:20 2023 -0500
+0e82a5b,JesusDBurgos,Modificacion Pedido post,Tue Jul 25 11:27:50 2023 -0500
+e2a8498,JesusDBurgos,cambios db,Tue Jul 25 08:29:03 2023 -0500
+e06ad64,JesusDBurgos,Add middleware - Add marca register,Tue Jul 25 08:10:22 2023 -0500
+48b24b1,JesusDBurgos,Update requirements.txt,Mon Jul 24 19:51:52 2023 -0500
+4badd6e,JesusDBurgos,Update requirements.txt,Mon Jul 24 19:36:17 2023 -0500
+54facde,JesusDBurgos,Update clientes.py,Sun Jul 23 22:26:55 2023 -0500
+df97a0f,JesusDBurgos,Update requirements.txt,Sun Jul 23 18:38:57 2023 -0500
+95e716f,JesusDBurgos,Update requirements.txt,Sun Jul 23 18:33:11 2023 -0500
+81b2693,JesusDBurgos,Update requirements.txt,Sun Jul 23 18:25:23 2023 -0500
+6830552,JesusDBurgos,Update requirements.txt,Sun Jul 23 18:22:43 2023 -0500
+9fcbeec,JesusDBurgos,Update requirements.txt,Sun Jul 23 18:09:22 2023 -0500
+1dea3d5,JesusDBurgos,Initial commit,Sun Jul 23 17:33:22 2023 -0500
