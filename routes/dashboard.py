@@ -127,7 +127,7 @@ def obtener_ventas_por_semana(
     return data
 
 @dashboardR.get("/indicadores_dashboard")
-async def obtener_ventas_por_semana(
+def obtener_ventas_por_semana(
     db: Session = Depends(get_db)
 ):
     # Obtener la fecha actual
