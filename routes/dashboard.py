@@ -145,6 +145,9 @@ def obtener_ventas_por_semana(
         .scalar()  # Utiliza scalar() para obtener un único valor en lugar de una tupla
     )
 
+    if total_pedidos is None:
+        total_pedidos = 0
+
     pedidos_entregados = (
         db.query(func.count(Pedido_table.valorTotal))
         .filter(Pedido_table.fechaEntrega <= ultimo_dia_mes_actual, Pedido_table.fechaEntrega >= primer_dia_mes_actual, Pedido_table.estado == "Entregado")
