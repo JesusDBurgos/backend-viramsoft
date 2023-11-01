@@ -144,7 +144,6 @@ def obtener_ventas_por_semana(
         .filter(Pedido_table.fechaEntrega <= ultimo_dia_mes_actual, Pedido_table.fechaEntrega >= primer_dia_mes_actual, Pedido_table.estado == "Entregado")
         .scalar()  # Utiliza scalar() para obtener un único valor en lugar de una tupla
     )
-    print(total_pedidos)
 
     pedidos_entregados = (
         db.query(func.count(Pedido_table.valorTotal))
@@ -190,8 +189,6 @@ def obtener_ventas_por_semana(
         .scalar()  # Utiliza scalar() para obtener un único valor en lugar de una tupla
     )
 
-    print(total_pedidos_mes_pasado)
-
     pedidos_entregados_mes_pasado = (
         db.query(func.count(Pedido_table.valorTotal))
         .filter(Pedido_table.fechaEntrega <= ultimo_dia_mes_pasado, Pedido_table.fechaEntrega >= primer_dia_mes_pasado, Pedido_table.estado == "Entregado")
@@ -200,16 +197,24 @@ def obtener_ventas_por_semana(
 
     clientes_nuevos_mes_pasado = (db.query(func.count(Cliente_table.documento)).filter(Cliente_table.fecha_agregado <= ultimo_dia_mes_pasado, Cliente_table.fecha_agregado >= primer_dia_mes_pasado, Cliente_table.estado == "ACTIVO").scalar())
 
-    if total_pedidos_mes_pasado is None or total_pedidos_mes_pasado == 0:
+    if total_pedidos_mes_pasado is None or total_pedidos_mes_pasado == 0 :
         porc_total_pedidos = 100
+    elif total_pedidos is None :
+        porc_total_pedidos = 0
     else:
         porc_total_pedidos = ((total_pedidos - total_pedidos_mes_pasado) / total_pedidos_mes_pasado) * 100
+
     if pedidos_entregados_mes_pasado is None or pedidos_entregados_mes_pasado == 0:
         porc_pedidos_entregados = 100
+    elif  pedidos_entregados is None:
+        porc_pedidos_entregados = 0
     else:
         porc_pedidos_entregados = ((pedidos_entregados - pedidos_entregados_mes_pasado) / pedidos_entregados_mes_pasado) * 100
+
     if clientes_nuevos_mes_pasado is None or clientes_nuevos_mes_pasado == 0:
         porc_clientes_nuevos = 100
+    elif clientes_nuevos is None: 
+        porc_clientes_nuevos = 0
     else:
         porc_clientes_nuevos = ((clientes_nuevos - clientes_nuevos_mes_pasado) / clientes_nuevos_mes_pasado) * 100
 
