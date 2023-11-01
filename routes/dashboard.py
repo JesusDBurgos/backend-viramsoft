@@ -202,21 +202,21 @@ def obtener_ventas_por_semana(
 
     if total_pedidos_mes_pasado is None or total_pedidos_mes_pasado == 0 :
         porc_total_pedidos = 100
-    elif total_pedidos is None :
+    elif total_pedidos is None or total_pedidos < total_pedidos_mes_pasado:
         porc_total_pedidos = 0
     else:
         porc_total_pedidos = ((total_pedidos - total_pedidos_mes_pasado) / total_pedidos_mes_pasado) * 100
 
     if pedidos_entregados_mes_pasado is None or pedidos_entregados_mes_pasado == 0:
         porc_pedidos_entregados = 100
-    elif  pedidos_entregados is None:
+    elif  pedidos_entregados is None or pedidos_entregados < pedidos_entregados_mes_pasado:
         porc_pedidos_entregados = 0
     else:
         porc_pedidos_entregados = ((pedidos_entregados - pedidos_entregados_mes_pasado) / pedidos_entregados_mes_pasado) * 100
 
     if clientes_nuevos_mes_pasado is None or clientes_nuevos_mes_pasado == 0:
         porc_clientes_nuevos = 100
-    elif clientes_nuevos is None: 
+    elif clientes_nuevos is None or clientes_nuevos < clientes_nuevos_mes_pasado: 
         porc_clientes_nuevos = 0
     else:
         porc_clientes_nuevos = ((clientes_nuevos - clientes_nuevos_mes_pasado) / clientes_nuevos_mes_pasado) * 100
