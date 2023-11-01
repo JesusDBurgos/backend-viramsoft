@@ -144,6 +144,7 @@ def obtener_ventas_por_semana(
         .filter(Pedido_table.fechaEntrega <= ultimo_dia_mes_actual, Pedido_table.fechaEntrega >= primer_dia_mes_actual, Pedido_table.estado == "Entregado")
         .scalar()  # Utiliza scalar() para obtener un único valor en lugar de una tupla
     )
+    print(total_pedidos)
 
     pedidos_entregados = (
         db.query(func.count(Pedido_table.valorTotal))
@@ -188,6 +189,8 @@ def obtener_ventas_por_semana(
         .filter(Pedido_table.fechaEntrega <= ultimo_dia_mes_pasado, Pedido_table.fechaEntrega >= primer_dia_mes_pasado, Pedido_table.estado == "Entregado")
         .scalar()  # Utiliza scalar() para obtener un único valor en lugar de una tupla
     )
+
+    print(total_pedidos_mes_pasado)
 
     pedidos_entregados_mes_pasado = (
         db.query(func.count(Pedido_table.valorTotal))
