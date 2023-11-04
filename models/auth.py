@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String,ForeignKey
+from sqlalchemy.orm import relationship
 from models.base import Base
 
 class User(Base):
@@ -8,3 +9,5 @@ class User(Base):
     nombre = Column( String(255), nullable=False)
     rol = Column( String(50), nullable=False)
     hashed_password = Column(String(255))
+
+    pedido = relationship("Pedido_table", back_populates="usuarios")

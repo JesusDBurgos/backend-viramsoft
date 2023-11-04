@@ -19,7 +19,7 @@ def login(user_login: UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales inválidas")
     
     # Generar el token JWT para el usuario autenticado
-    access_token = create_access_token({"sub": user.username, "name": user.nombre})
+    access_token = create_access_token({"id": user.id})
     return {"access_token": access_token, "token_type": "bearer"}
 
 @auth_router.post("/login_web", summary="Este endpoint hace el login en la aplicacion web", status_code=status.HTTP_202_ACCEPTED)

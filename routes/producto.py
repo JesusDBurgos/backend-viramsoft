@@ -47,7 +47,7 @@ async def get_products(db: Session = Depends(get_db)):
     )
 
     product_list = []
-    print(products)    
+   
     for product in products:
         product_dict = {
             "idProducto": product.idProducto,

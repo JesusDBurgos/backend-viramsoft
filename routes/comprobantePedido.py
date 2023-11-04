@@ -8,6 +8,7 @@ from models.index import (
     Producto_table,
     Pedido_table,
     Cliente_table,
+    User
 )
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
@@ -36,7 +37,7 @@ async def generar_comprobanteP(
     if pedido:
         # Acceder al atributo documentoCliente del objeto Pedido
         documento_cliente = pedido.documentoCliente
-        vendedor = pedido.vendedor
+        vendedor = db.query(User).filter(User.id == pedido.idVendedor).first()
         valor_total = pedido.valorTotal
         fecha_pedido = pedido.fechaPedido
         fecha_entrega = pedido.fechaEntrega
@@ -104,7 +105,7 @@ async def generar_comprobanteP(
         style_left,
     )
     vendedor_texto = Paragraph(
-        f"<b>Vendedor:</b> {vendedor}",
+        f"<b>Vendedor:</b> {vendedor.nombre}",
         style_left,
     )
 

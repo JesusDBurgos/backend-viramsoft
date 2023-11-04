@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends,status, Response, HTTPException
 from config.database import conn,get_db
-from models.index import Pedido_table,DetallePedido_table, Producto_table, Cliente_table
+from models.index import Pedido_table,DetallePedido_table, Producto_table, Cliente_table,User
 from auth.jwt import decode_token
 from schemas.index import PedidoAggPydantic,ProductoPydantic, ProductosPedAggPydantic 
 from sqlalchemy.orm import Session, joinedload
@@ -64,18 +64,19 @@ def get_orders_by_vendor(token: str,db: Session = Depends(get_db)):
     """
     vendedor = decode_token(token)
     # Consultar todos los productos de la base de datos utilizando SQLAlchemy
-    orders = db.query(Pedido_table).join(Cliente_table).options(joinedload(Pedido_table.clientes)).filter(Pedido_table.vendedor == vendedor["name"]).all()
+    orders = db.query(Pedido_table).join(Cliente_table).options(joinedload(Pedido_table.clientes)).filter(Pedido_table.idVendedor == vendedor["id"]).all()
     # Verificar si hay productos. Si no hay productos, lanzar una excepción 404 (Not Found)
     if not orders:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No se encontraron pedidos")
     
+    vendedor_nombre = db.query(User).filter(User.id == vendedor["id"]).first()
     # Crear una lista para almacenar los pedidos formateados
     formatted_orders = []
     # Recorrer la lista de pedidos y construir el diccionario de respuesta
     for order in orders:
         order_dict = {
             "documentoCliente": order.clientes.documento,  # Obtener el documento del cliente
-            "vendedor": order.vendedor,
+            "vendedor": vendedor_nombre.nombre,
             "observacion": order.observacion,
             "fechaEntrega": str(order.fechaEntrega),
             "estado": order.estado,
@@ -133,7 +134,7 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
     vendedor = decode_token(pedido.token)
     db_pedido = Pedido_table(
                               documentoCliente = pedido.documentoCliente,
-                              vendedor = vendedor["name"],
+                              idVendedor = vendedor["id"],
                               observacion = pedido.observacion,
                               fechaPedido= fecha_pedido,
                               fechaEntrega= fecha_entrega_str,
