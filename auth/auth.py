@@ -71,7 +71,7 @@ def get_users(db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No se encontraron usuarios")
     
     # Crear una lista para almacenar los pedidos formateados
-    formatted_orders = []
+    formatted_users = []
     # Recorrer la lista de pedidos y construir el diccionario de respuesta
     for user in users:
         user_dict = {
