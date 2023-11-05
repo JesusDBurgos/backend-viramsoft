@@ -3,6 +3,7 @@ from config.database import conn,get_db
 from models.index import Cliente_table
 from schemas.index import ClientePydantic, ClienteEditarPydantic
 from sqlalchemy.orm import Session
+from datetime import datetime
 from sqlalchemy import select,update, and_
 
 clientesR = APIRouter()
@@ -122,11 +123,13 @@ def create_costumer(cliente: ClientePydantic, db: Session = Depends(get_db)):
         # Si el cliente ya existe y está activo, se devuelve un error indicando que ya está registrado
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El cliente ya está registrado y activo.")
     else: 
+        fecha_actual = datetime.now()
         # Crear un nuevo objeto Cliente_table utilizando los datos proporcionados en el cuerpo de la solicitud
         db_product = Cliente_table(documento = cliente.documento,
                                     nombre = cliente.nombre,
                                     direccion= cliente.direccion,
                                     telefono= cliente.telefono,
+                                    fecha_agregado= fecha_actual,
                                     estado = "ACTIVO")
         # Agregar el nuevo producto a la sesión de la base de datos
         db.add(db_product)

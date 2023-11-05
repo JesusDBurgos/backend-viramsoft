@@ -35,7 +35,7 @@ def get_orders(db: Session = Depends(get_db)):
     for order in orders:
         order_dict = {
             "documentoCliente": order.clientes.documento,  # Obtener el documento del cliente
-            "vendedor": order.vendedor,
+            "vendedor": order.idVendedor,
             "observacion": order.observacion,
             "fechaEntrega": str(order.fechaEntrega),
             "estado": order.estado,
