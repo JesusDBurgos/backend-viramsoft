@@ -52,7 +52,7 @@ def register(user_register: UserRegister, db: Session = Depends(get_db)):
     db.refresh(new_user)
     return {"message": "Usuario registrado exitosamente"}
 
-@auth_router.get("/users",summary="Este endpoint consulta los usuarios", status_code=status.HTTP_200_OK)
+@auth_router.get("/user",summary="Este endpoint consulta los usuarios", status_code=status.HTTP_200_OK)
 def get_users(db: Session = Depends(get_db)):
     """
     Obtiene todos los usuarios desde la base de datos.
