@@ -29,7 +29,7 @@ def get_orders(db: Session = Depends(get_db)):
     if not orders:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No se encontraron pedidos")
     
-    vendedor_nombre = db.query(User).filter(User.id == vendedor["id"]).first()
+    vendedor_nombre = db.query(User).filter(User.id == orders.idVendedor).first()
 
     # Crear una lista para almacenar los pedidos formateados
     formatted_orders = []
