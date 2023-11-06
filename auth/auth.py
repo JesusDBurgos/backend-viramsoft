@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from models.index import User
 from auth.jwt import create_access_token, decode_token, hash_password, verify_password
 from schemas.auth import UserLogin,UserRegister
-from models.auth import User
-from config.database import get_db
+from sqlalchemy import select, update
+from config.database import get_db, conn
 
 auth_router = APIRouter()
 
@@ -84,3 +84,40 @@ def get_users(db: Session = Depends(get_db)):
 
     # Devolver una respuesta JSON con la lista de pedidos formateados
     return {"usuarios": formatted_users}
+
+@auth_router.put(
+    "/edit_user/{id}",
+    status_code=status.HTTP_200_OK,
+)
+def update_data(
+    id: int, user: UserRegister, db: Session = Depends(get_db)
+):
+    # Verificar si el producto existe en la base de datos
+    existing_user = db.execute(
+        select(User).where(User.id == id)
+    ).fetchone()
+    if not existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="El usuario no existe"
+        )
+
+    try:
+        # Crear la consulta para actualizar el producto en la base de datos
+        query = update(User).where(User.id == id).values(
+            username=user.username,
+            hashed_password= hash_password(user.password),
+            nombre=user.nombre,
+            rol=user.rol,
+        )
+
+        db.execute(query)
+        db.commit()
+
+        print("Usuario actualizado con éxito")
+        return {"mensaje" : "Usuario actualizado con éxito"}
+    except Exception as e:
+        # Manejar errores en la base de datos u otros errores inesperados
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno del servidor",
+        )

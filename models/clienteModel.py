@@ -1,6 +1,7 @@
 from sqlalchemy import Column
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import String, Date
+from datetime import datetime
 from models.base import Base
 
 class Cliente_table(Base):
