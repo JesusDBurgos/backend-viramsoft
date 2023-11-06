@@ -138,6 +138,8 @@ def obtener_ventas_por_semana(
     ultimo_dia_mes_actual = fecha_actual.replace(day=calendar.monthrange(fecha_actual.year, fecha_actual.month)[1]).replace(hour=23).replace(minute=59).replace(second=59)
 
     print(primer_dia_mes_actual,ultimo_dia_mes_actual)
+
+    result = db.execute(text("CALL CalculaGanancias(@gananciasMesActual, @gananciasMesPasado);"))
     
     total_pedidos = (
         db.query(func.sum(Pedido_table.valorTotal))
@@ -164,11 +166,14 @@ def obtener_ventas_por_semana(
 
     clientes_nuevos = (db.query(func.count(Cliente_table.documento)).filter(Cliente_table.fecha_agregado <= ultimo_dia_mes_actual, Cliente_table.fecha_agregado >= primer_dia_mes_actual, Cliente_table.estado == "ACTIVO").scalar())
 
+    ganancias_mes_actual = db.execute(text("SELECT @gananciasMesActual;")).fetchone()[0]
+
     valores = {}
 
     valores["total_pedidos"] = f"{total_pedidos}"
     valores["pedidos_entregados"] = f"{pedidos_entregados}"
     valores["clientes_nuevos"] = f"{clientes_nuevos}"
+    valores["ganancias"] = f"{ganancias_mes_actual}"
 
     porcentajes = {}
 
@@ -200,6 +205,9 @@ def obtener_ventas_por_semana(
 
     clientes_nuevos_mes_pasado = (db.query(func.count(Cliente_table.documento)).filter(Cliente_table.fecha_agregado <= ultimo_dia_mes_pasado, Cliente_table.fecha_agregado >= primer_dia_mes_pasado, Cliente_table.estado == "ACTIVO").scalar())
 
+    ganancias_mes_pasado = db.execute(text("SELECT @gananciasMesPasado;")).fetchone()[0]
+    print(ganancias_mes_pasado)
+
     if total_pedidos_mes_pasado is None or total_pedidos_mes_pasado == 0 :
         porc_total_pedidos = 100
     elif total_pedidos is None or total_pedidos < total_pedidos_mes_pasado:
@@ -214,6 +222,13 @@ def obtener_ventas_por_semana(
     else:
         porc_pedidos_entregados = ((pedidos_entregados - pedidos_entregados_mes_pasado) / pedidos_entregados_mes_pasado) * 100
 
+    if ganancias_mes_pasado is None or ganancias_mes_pasado == 0:
+        porc_ganancias = 100
+    elif  ganancias_mes_actual is None or ganancias_mes_actual < ganancias_mes_pasado:
+        porc_ganancias = 0
+    else:
+        porc_ganancias = ((pedidos_entregados - pedidos_entregados_mes_pasado) / pedidos_entregados_mes_pasado) * 100
+
     if clientes_nuevos_mes_pasado is None or clientes_nuevos_mes_pasado == 0:
         porc_clientes_nuevos = 100
     elif clientes_nuevos is None or clientes_nuevos < clientes_nuevos_mes_pasado: 
@@ -224,6 +239,7 @@ def obtener_ventas_por_semana(
     porcentajes["porc_total_pedidos"] = f"{porc_total_pedidos}%"
     porcentajes["porc_pedidos_entregados"] = f"{porc_pedidos_entregados}%"
     porcentajes["porc_clientes_nuevos"] = f"{porc_clientes_nuevos}%"
+    porcentajes["porc_ganancias"] = f"{porc_ganancias}%"
     print(primer_dia_mes_actual,primer_dia_mes_pasado)
 
     return valores, ultimos_pedidos, porcentajes
