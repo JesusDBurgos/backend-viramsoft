@@ -93,19 +93,24 @@ def update_data(
     id: int, user: UserRegister, db: Session = Depends(get_db)
 ):
     # Verificar si el producto existe en la base de datos
-    existing_user = db.execute(
-        select(User).where(User.id == id)
-    ).fetchone()
+
+    existing_user = db.query(User).filter(User.id == id).first()
     if not existing_user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="El usuario no existe"
         )
-
+    print(existing_user.hashed_password)
     try:
+        
+        if user.password == "":
+            password = existing_user.hashed_password
+        else:
+            password = hash_password(user.password)
+
         # Crear la consulta para actualizar el producto en la base de datos
         query = update(User).where(User.id == id).values(
             username=user.username,
-            hashed_password= hash_password(user.password),
+            hashed_password= password,
             nombre=user.nombre,
             rol=user.rol,
         )
