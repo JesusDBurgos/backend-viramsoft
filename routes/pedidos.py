@@ -236,20 +236,18 @@ def update_state_delivered(
 def update_state_canceled(
     id:int,db: Session = Depends(get_db)
 ):
-    if not isinstance(id, int) or id <= 0:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="El ID del pedido debe ser un número entero positivo"
-        )
-    # Verificar si el pedido existe en la base de datos
-    existing_order = conn.execute(
-        select(Pedido_table).where(Pedido_table.idPedido == id)
-    ).fetchone()
-    if not existing_order:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="El pedido no existe"
-        )
-
     try:
+        # Comenzar transacción anidada
+        db.begin_nested() 
+        # Validaciones
+        if id <= 0:
+            raise ValueError("El ID debe ser positivo")
+        # Verificar si el pedido existe en la base de datos
+        existing_order = conn.execute(
+            select(Pedido_table).where(Pedido_table.idPedido == id)
+        ).fetchone()
+        if not existing_order or existing_order.estado != "Pendiente":
+            raise ValueError("No se puede marcar este pedido como cancelado")
         # Crear la consulta para actualizar el pedido en la base de datos
         query = (
             update(Pedido_table)
@@ -271,15 +269,11 @@ def update_state_canceled(
 
         # Realizar el commit para guardar los cambios en la base de datos
         db.commit()
+    except ValueError as ve:
+        db.rollback() 
+        raise HTTPException(400, detail=str(ve))
 
-        return {"mensaje" : "El pedido se marcó como cancelado exitosamente"}
-    except Exception as e:
-        # Manejar errores en la base de datos u otros errores inesperados
-        error_message = "Error interno del servidor"
-        if isinstance(e, SQLAlchemyError):
-            error_message = str(e.__dict__['orig'])
-
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=error_message,
-        )
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(500, detail=str(e.__dict__['orig']))
+    return {"mensaje" : "El pedido se marcó como cancelado exitosamente"}
