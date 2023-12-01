@@ -12,8 +12,9 @@ from fastapi.responses import JSONResponse
 from config.database import conn, get_db
 from models.index import Producto_table, ImagenProducto
 from schemas.index import ProductoPydantic, ProductoUpdatePydantic
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, joinedload, query
 from sqlalchemy import select, update
+from sqlalchemy.exc import IntegrityError
 from typing import List
 import base64
 import locale
@@ -296,27 +297,16 @@ def cargar_imagen(
 def update_data(
     id: int, producto: ProductoUpdatePydantic, db: Session = Depends(get_db)
 ):
-    # Verificar si el producto existe en la base de datos
-    existing_product = conn.execute(
-        select(Producto_table).where(Producto_table.idProducto == id)
-    ).fetchone()
-    if not existing_product:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="El producto no existe"
-        )
+    db_product = db.query(Producto_table).get(id)
+    if not db_product:
+        raise NotFoundException()
 
     try:
-        # Crear la consulta para actualizar el producto en la base de datos
-        query = (
-            update(Producto_table)
-            .where(Producto_table.idProducto == id)
-            .values(
-                cantidad=producto.cantidad,
-                valorCompra=producto.valorCompra,
-                valorVenta=producto.valorVenta,
-            )
-        )
-
+        # Actualizar el producto en la base de datos
+        db_product.cantidad = producto.cantidad
+        db_product.valorCompra = producto.valorCompra
+        db_product.valorVenta = producto.valorVenta
+        
         # Consultar si ya existe una imagen para el producto
         existing_image = (
             db.query(ImagenProducto).filter(
@@ -325,7 +315,6 @@ def update_data(
 
         # Decodificar la imagen de base64 a datos binarios
         
-
         if producto.imagen != "":
             imagen_data = base64.b64decode(producto.imagen)
             if existing_image:
@@ -335,23 +324,11 @@ def update_data(
                 # Si no existe una imagen, crea una nueva fila en la base de datos
                 db_image = ImagenProducto(imagen=imagen_data, producto_id=id)
                 db.add(db_image)
-        # Ejecutar la consulta para actualizar el producto en la base de datos
-        db.execute(query)
 
         # Realizar el commit para guardar los cambios en la base de datos
         db.commit()
+    except IntegrityError:
+        raise DBException()
 
-        # Crear una consulta para obtener el producto actualizado
-        updated_product = (
-            db.query(Producto_table).filter(
-                Producto_table.idProducto == id).first()
-        )
-
-        # Devolver el producto actualizado en el formato esperado (ProductoPydantic)
-        return updated_product
-    except Exception as e:
-        # Manejar errores en la base de datos u otros errores inesperados
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error interno del servidor",
-        )
+    return db_product
+    
