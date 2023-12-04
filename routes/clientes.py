@@ -3,6 +3,7 @@ from config.database import conn,get_db
 from models.index import Cliente_table
 from schemas.index import ClientePydantic, ClienteEditarPydantic
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 from sqlalchemy import select,update, and_
 
@@ -154,15 +155,26 @@ def update_data(id: str, cliente: ClienteEditarPydantic):
     - 200 OK: Si el cliente se crea correctamente.
         - Devuelve el nuevo cliente modificado en formato ClientePydantic (JSON).
     """
-    # Crear la consulta para actualizar el cliente en la base de datos
-    query = update(Cliente_table).where(Cliente_table.documento == id).values(
-                    nombre = cliente.nombre,
-                    direccion= cliente.direccion,
-                    telefono= cliente.telefono)
-    # Ejecutar la consulta para actualizar el cliente en la base de datos
-    conn.execute(query)
-    # Realizar el commit para guardar los cambios en la base de datos
-    conn.commit()
+    # Iniciar una transacción
+    trans = conn.begin()
+    try:
+        # Crear la consulta para actualizar el cliente en la base de datos
+        query = update(Cliente_table).where(Cliente_table.documento == id).values(
+                        nombre = cliente.nombre,
+                        direccion= cliente.direccion,
+                        telefono= cliente.telefono)
+        # Ejecutar la consulta para actualizar el cliente en la base de datos
+        conn.execute(query)
+        # Realizar el commit para guardar los cambios en la base de datos
+        trans.commit()
+    except SQLAlchemyError:
+        # Si ocurre un error, revertir la transacción
+        trans.rollback()
+        raise
+    finally:
+        # Si la transacción todavía está activa, revertirla
+        if trans.is_active:
+            trans.rollback()
     # Crear una consulta para obtener el cliente actualizado
     response = select(Cliente_table).where(Cliente_table.documento == id)
     # Ejecutar la consulta para obtener el cliente actualizado de la base de datos
