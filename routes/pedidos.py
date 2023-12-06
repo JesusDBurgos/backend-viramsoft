@@ -5,6 +5,7 @@ from auth.jwt import decode_token
 from schemas.index import PedidoAggPydantic,ProductoPydantic, ProductosPedAggPydantic 
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import select,update, text
+from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 from itertools import count
 from typing import List
@@ -190,7 +191,10 @@ def create_order(pedido: PedidoAggPydantic, productos: List[ProductosPedAggPydan
 )
 def update_state_delivered(
     id:int,db: Session = Depends(get_db)
-):
+):  
+    db_order = db.query(Pedido_table).get(id)
+    if not db_order:
+        raise NotFoundException()
 
     try:
         # Comenzar transacción anidada
@@ -218,13 +222,8 @@ def update_state_delivered(
 
         # Realizar el commit para guardar los cambios en la base de datos
         db.commit()
-    except ValueError as ve:
-        db.rollback() 
-        raise HTTPException(400, detail=str(ve))
-
-    except SQLAlchemyError as e:
-        db.rollback()
-        raise HTTPException(500, detail=str(e.__dict__['orig']))
+    except IntegrityError:
+        raise DBException()
 
     return {"mensaje" : "El pedido se marcó como entregado exitosamente"}
     
@@ -236,18 +235,13 @@ def update_state_delivered(
 def update_state_canceled(
     id:int,db: Session = Depends(get_db)
 ):
+    db_order = db.query(Pedido_table).get(id)
+    if not db_order:
+        raise NotFoundException()
     try:
-        # Comenzar transacción anidada
-        db.begin_nested() 
         # Validaciones
         if id <= 0:
             raise ValueError("El ID debe ser positivo")
-        # Verificar si el pedido existe en la base de datos
-        existing_order = conn.execute(
-            select(Pedido_table).where(Pedido_table.idPedido == id)
-        ).fetchone()
-        if not existing_order or existing_order.estado != "Pendiente":
-            raise ValueError("No se puede marcar este pedido como cancelado")
         # Crear la consulta para actualizar el pedido en la base de datos
         query = (
             update(Pedido_table)
@@ -269,11 +263,6 @@ def update_state_canceled(
 
         # Realizar el commit para guardar los cambios en la base de datos
         db.commit()
-    except ValueError as ve:
-        db.rollback() 
-        raise HTTPException(400, detail=str(ve))
-
-    except SQLAlchemyError as e:
-        db.rollback()
-        raise HTTPException(500, detail=str(e.__dict__['orig']))
+    except IntegrityError:
+        raise DBException()
     return {"mensaje" : "El pedido se marcó como cancelado exitosamente"}
